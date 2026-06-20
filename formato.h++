@@ -6,7 +6,7 @@ struct formatoPregunta
 {
     char pregunta[300];
     char respuestaTexto[4][99];
-    bool respuestaCorrecta[4];
+    int respuestaCorrecta[4];
     int puntajeAsignado;
     formatoPregunta *sig;
     formatoPregunta *ant;

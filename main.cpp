@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include "GenEx.h++"
 enum estados
 {
     MENU,
@@ -21,7 +22,7 @@ void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color
 void DrawTitleCentered(const char *text, int y, int fontSize, Color color)
 {
     int textWidth = MeasureText(text, fontSize);
-    int textX = (500 - textWidth) / 2 ;
+    int textX = (500 - textWidth) / 2;
     DrawText(text, textX, y, fontSize, color);
 }
 int main()
@@ -32,6 +33,21 @@ int main()
     SetTargetFPS(60);
     estados estadoJ = MENU;
 
+    // variables para generar preguntas
+    formatoPregunta *nuevaPregunta;
+    nuevaPregunta = new formatoPregunta;
+    for (int i = 0; i < 4; i++)
+    {
+        nuevaPregunta->pregunta[0] = '\0';
+        nuevaPregunta->respuestaTexto[i][0] = '\0';
+        nuevaPregunta->respuestaCorrecta[i] = 0;
+    }
+    nuevaPregunta->puntajeAsignado = 0;
+
+    int contadorDeCaracteres = 0;
+    int contadorCaractersR[4] = {0, 0, 0, 0};
+    int indice = -1;
+
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
     Rectangle botonGenerar = {(float)(screenWidth / 2 - 125), 350, 250, 50};
@@ -40,6 +56,8 @@ int main()
 
     // Botones extras
     Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
+    Rectangle botonGuardarYSalir = {(float)(screenWidth / 4 - 125), 700, 250, 50};
+    Rectangle botonGuardarYSiguiente = {(float)((screenWidth / 4 - 125) * 8), 700, 250, 50};
 
     while (!WindowShouldClose())
     {
@@ -49,6 +67,8 @@ int main()
         bool ratonSobreModificar = CheckCollisionPointRec(ratonPos, botonModificar);
         bool ratonSobreSalir = CheckCollisionPointRec(ratonPos, botonSalir);
         bool ratonSobreCalificar = CheckCollisionPointRec(ratonPos, botonCalificar);
+        bool ratonSobreGuardarYSalir = CheckCollisionPointRec(ratonPos, botonGuardarYSalir);
+        bool ratonSobreGuardarYSiguiente = CheckCollisionPointRec(ratonPos, botonGuardarYSiguiente);
 
         switch (estadoJ)
         {
@@ -77,6 +97,47 @@ int main()
             break;
 
         case GENERAR:
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                indice++;
+                if (indice > 5)
+                    indice = -1;
+            }
+            if (IsKeyPressed(KEY_UP))
+            {
+                indice--;
+                if (indice < -1)
+                    indice = 5;
+            }
+
+            if (indice == -1)
+            {
+                capturarPregunta(nuevaPregunta, contadorDeCaracteres);
+            }
+            else if (indice >= 0 && indice <= 3)
+            {
+                capturarResepuesta(nuevaPregunta, contadorCaractersR[indice], indice);
+            }
+            else if (indice == 4)
+            {
+                capuitraRC(nuevaPregunta);
+            }
+            else if (indice == 5)
+            {
+                capturaPA(nuevaPregunta);
+            }
+
+            if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                guardar(nuevaPregunta, contadorDeCaracteres,  contadorCaractersR,  indice);
+                estadoJ = MENU;
+            }
+            if (ratonSobreGuardarYSiguiente&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                guardar(nuevaPregunta,  contadorDeCaracteres,  contadorCaractersR,  indice);
+                estadoJ = GENERAR;
+            }
+            
 
             break;
 
@@ -118,7 +179,7 @@ int main()
             DrawTitleCentered("Exams", 100, 50, GREEN);
             //----------------Boton aplicar--------------
             DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? LIGHTGRAY : RED);
-            DrawTextCentered("Generar", botonAplicar, 28, WHITE);
+            DrawTextCentered("Aplicar", botonAplicar, 28, WHITE);
 
             //----------------Boton aplicar--------------
             DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? LIGHTGRAY : RED);
@@ -138,10 +199,51 @@ int main()
             break;
 
         case GENERAR:
+            DrawTitleCentered("Creador de Preguntas", 30, 32, GREEN);
+            DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 16, DARKGRAY);
 
-            break;
+            DrawText("Pregunta:", 50, 110, 18, BLACK);
+            DrawRectangle(50, 135, 600, 35, LIGHTGRAY);
+            DrawText(nuevaPregunta->pregunta, 60, 142, 18, BLACK);
+            if (indice == -1 && (int)(GetTime() * 2) % 2 == 0)
+                DrawText("_", 60 + MeasureText(nuevaPregunta->pregunta, 18), 142, 18, BLACK);
 
-        default:
+            for (int i = 0; i < 4; i++)
+            {
+                int posYLabel = 185 + (i * 75);
+                int posYBox = 210 + (i * 75);
+
+                char prefijo[12] = {'O', 'p', 'c', 'i', 'o', 'n', ' ', (char)('A' + i), ':', '\0'};
+                DrawText(prefijo, 50, posYLabel, 18, BLACK);
+                DrawRectangle(50, posYBox, 600, 35, LIGHTGRAY);
+                DrawText(nuevaPregunta->respuestaTexto[i], 60, posYBox + 7, 18, BLACK);
+
+                if (indice == i && (int)(GetTime() * 2) % 2 == 0)
+                    DrawText("_", 60 + MeasureText(nuevaPregunta->respuestaTexto[i], 18), posYBox + 7, 18, BLACK);
+            }
+
+            DrawText("Presiona la tecla (A, B, C, D) para la respuesta correcta:", 50, 495, 18, BLACK);
+            DrawRectangle(50, 520, 200, 35, LIGHTGRAY);
+
+            char opcCorr[2] = {'-', '\0'};
+            for (int i = 0; i < 4; i++)
+            {
+                if (nuevaPregunta->respuestaCorrecta[i] == 1)
+                    opcCorr[0] = 'A' + i;
+            }
+            DrawText(opcCorr, 140, 527, 20, BLACK);
+
+            DrawText("Asigna un puntaje (Tecla num. 0-9):", 50, 570, 18, BLACK);
+            DrawRectangle(50, 595, 200, 35, LIGHTGRAY);
+
+            char puntajeTxt[4];
+            sprintf(puntajeTxt, "%d", nuevaPregunta->puntajeAsignado);
+            DrawText(puntajeTxt, 140, 602, 20, BLACK);
+
+            DrawRectangleRounded(botonGuardarYSalir, 0.3f, 6, ratonSobreGuardarYSalir ? DARKGREEN : GREEN);
+            DrawTextCentered("Guardar y salir", botonGuardarYSalir, 24, WHITE);
+            DrawRectangleRounded(botonGuardarYSiguiente, 0.3f, 6, ratonSobreGuardarYSiguiente ? DARKGREEN : GREEN);
+            DrawTextCentered("Guardar y siguiente", botonGuardarYSiguiente, 24, WHITE);
             break;
         }
 
