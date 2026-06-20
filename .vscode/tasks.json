@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Compilar Raylib FIJO",
+            "command": "C:\\raylib\\w64devkit\\bin\\gcc.exe",
+            "args": [
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-I", "C:/raylib/raylib/src",
+                "-L", "C:/raylib/raylib/src",
+                "-lraylib",
+                "-lopengl32",
+                "-lgdi32",
+                "-lwinmm",
+                "-lpthread",
+                "-static"
+            ],
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "PATH": "C:\\raylib\\w64devkit\\bin;${env:PATH}" // Esto fuerza el orden correcto
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
