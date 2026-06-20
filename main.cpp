@@ -21,13 +21,13 @@ void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color
 void DrawTitleCentered(const char *text, int y, int fontSize, Color color)
 {
     int textWidth = MeasureText(text, fontSize);
-    int textX = (500 - textWidth) / 2;
+    int textX = (500 - textWidth) / 2 ;
     DrawText(text, textX, y, fontSize, color);
 }
 int main()
 {
     const int screenWidth = 700;
-    const int screenHeight = 1000;
+    const int screenHeight = 800;
     InitWindow(screenWidth, screenHeight, "Exams");
     SetTargetFPS(60);
     estados estadoJ = MENU;
@@ -85,6 +85,7 @@ int main()
         }
         //--dibujar--
         BeginDrawing();
+        ClearBackground(WHITE);
         if (estadoJ == MENU)
         {
             if (ratonSobreAplicar)
@@ -117,7 +118,7 @@ int main()
             DrawTitleCentered("Exams", 100, 50, GREEN);
             //----------------Boton aplicar--------------
             DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? LIGHTGRAY : RED);
-            DrawTextCentered("APLICAR", botonAplicar, 28, WHITE);
+            DrawTextCentered("Generar", botonAplicar, 28, WHITE);
 
             //----------------Boton aplicar--------------
             DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? LIGHTGRAY : RED);
