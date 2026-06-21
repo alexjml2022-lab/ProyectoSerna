@@ -1,2 +1,3 @@
 Pregunta:prueba ap	OpcionA:dv 	CORRECTA	OpcionB:rgv	INCORRECTA	OpcionC:tbgh	INCORRECTA	OpcionD:grbfa	INCORRECTA	Puntaje:4
 Pregunta:regref	OpcionA:wefq	CORRECTA	OpcionB:rewf	INCORRECTA	OpcionC:fwer	INCORRECTA	OpcionD:ferwq	INCORRECTA	Puntaje:6
+Pregunta:QWEE	OpcionA:WEFDA	CORRECTA	OpcionB:WADEFGVR	INCORRECTA	OpcionC:WAFG	INCORRECTA	OpcionD:WAFGV	INCORRECTA	Puntaje:3

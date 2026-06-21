@@ -51,6 +51,7 @@ int main()
     int presionadoVal;
     int numP = 1;
     int puntuacion = 0;
+    bool rSelect;
 
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
@@ -58,22 +59,36 @@ int main()
     Rectangle botonModificar = {(float)(screenWidth / 2 - 125), 450, 250, 50};
     Rectangle botonSalir = {(float)(screenWidth / 2 - 125), 550, 250, 50};
 
-    // Botones extras
-    Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
+    // Botones generar
     Rectangle botonGuardarYSalir = {50.0f, 700.0f, 260.0f, 50.0f};
     Rectangle botonGuardarYSiguiente = {390.0f, 700.0f, 260.0f, 50.0f};
-    Rectangle botonOpcA= {(float)((screenWidth / 4 - 125)), 200, 250, 50};
+
+    // bototnes aplicar
+    Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
+    Rectangle botonOpcA = {70, 220 + (0 * 40), 20, 25};
+    Rectangle botonOpcB = {70, 220 + (1 * 40), 20, 25};
+    Rectangle botonOpcC = {70, 220 + (2 * 40), 20, 25};
+    Rectangle botonOpcD = {70, 220 + (3 * 40), 20, 25};
 
     while (!WindowShouldClose())
     {
         Vector2 ratonPos = GetMousePosition();
+        //--MENU--
         bool ratonSobreAplicar = CheckCollisionPointRec(ratonPos, botonAplicar);
         bool ratonSobreGenerar = CheckCollisionPointRec(ratonPos, botonGenerar);
         bool ratonSobreModificar = CheckCollisionPointRec(ratonPos, botonModificar);
         bool ratonSobreSalir = CheckCollisionPointRec(ratonPos, botonSalir);
-        bool ratonSobreCalificar = CheckCollisionPointRec(ratonPos, botonCalificar);
+
+        //--GENERAR--
         bool ratonSobreGuardarYSalir = CheckCollisionPointRec(ratonPos, botonGuardarYSalir);
         bool ratonSobreGuardarYSiguiente = CheckCollisionPointRec(ratonPos, botonGuardarYSiguiente);
+
+        //--APLICAR--
+        bool ratonSobreCalificar = CheckCollisionPointRec(ratonPos, botonCalificar);
+        bool ratonSobreOpcA = CheckCollisionPointRec(ratonPos, botonOpcA);
+        bool ratonSobreOpcB = CheckCollisionPointRec(ratonPos, botonOpcB);
+        bool ratonSobreOpcC = CheckCollisionPointRec(ratonPos, botonOpcC);
+        bool ratonSobreOpcD = CheckCollisionPointRec(ratonPos, botonOpcD);
 
         switch (estadoJ)
         {
@@ -92,6 +107,8 @@ int main()
                 preguntaActual = lista;
                 numP = 1;
                 estadoJ = APLICAR;
+                presionadoVal = -1;
+                puntuacion=0;
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
@@ -110,7 +127,6 @@ int main()
 
         case APLICAR:
 
-            int rSelect;
             if (preguntaActual != NULL) // Validamos con el navegador
             {
                 if (IsKeyPressed(KEY_RIGHT)) // Flecha Derecha va a la SIGUIENTE pregunta
@@ -132,19 +148,62 @@ int main()
                     }
                 }
 
-                /*
-                if (rSelect == 1 && presionadoVal == 0)
+                if (ratonSobreOpcA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                 {
-
-                    puntuacion += lista->puntajeAsignado;
-                    presionadoVal = 1;
-                }
-                else if (rSelect == 0 && presionadoVal == 1)
-                {
-                    puntuacion -= lista->puntajeAsignado;
                     presionadoVal = 0;
+                    if (lista->respuestaCorrecta[0] == 1)
+                    {
+                        puntuacion += lista->puntajeAsignado;
+                        rSelect=0;
+                    }
+                    else if (rSelect == 0 && presionadoVal == 0)
+                    {
+                        puntuacion -= lista->puntajeAsignado;
+                        rSelect = 1;
+                    }
                 }
-                    */
+                else if (ratonSobreOpcB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    presionadoVal = 1;
+                    if (lista->respuestaCorrecta[1] == 1)
+                    {
+                        puntuacion += lista->puntajeAsignado;
+                        rSelect=0;
+                    }
+                    else if (rSelect == 0 && presionadoVal == 1)
+                    {
+                        puntuacion -= lista->puntajeAsignado;
+                        rSelect = 1;
+                    }
+                }
+                else if (ratonSobreOpcC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    presionadoVal = 2;
+                    if (lista->respuestaCorrecta[2] == 1)
+                    {
+                        puntuacion += lista->puntajeAsignado;
+                        rSelect=0;
+                    }
+                    else if (rSelect == 0 && presionadoVal == 2)
+                    {
+                        puntuacion -= lista->puntajeAsignado;
+                        rSelect = 1;
+                    }
+                }
+                else if (ratonSobreOpcD && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    presionadoVal = 3;
+                    if (lista->respuestaCorrecta[3] == 1)
+                    {
+                        puntuacion += lista->puntajeAsignado;
+                        rSelect=0;
+                    }
+                    else if (rSelect == 0 && presionadoVal == 3)
+                    {
+                        puntuacion -= lista->puntajeAsignado;
+                        presionadoVal = 1;
+                    }
+                }
             }
 
             if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -255,13 +314,27 @@ int main()
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 50, 75, 16, DARKGRAY);
             if (preguntaActual != NULL) // Cambiado a preguntaActual
             {
-                DrawText(preguntaActual->pregunta, 55, 150, 20, BLACK);
+                char numPP[0];
+                sprintf(numPP, "%d", numP);
+                DrawText(numPP, 40, 150, 30, BLACK);
+                DrawText(preguntaActual->pregunta, 65, 150, 30, BLACK);
 
                 // Mostrar las opciones leídas de la lista
                 for (int i = 0; i < 4; i++)
                 {
-                    DrawText(preguntaActual->respuestaTexto[i], 70, 220 + (i * 40), 18, DARKGRAY);
+                    DrawText(preguntaActual->respuestaTexto[i], 150, 220 + (i * 40), 20, DARKGRAY);
                 }
+                if (!(A == presionadoVal))
+                    DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? LIGHTGRAY : RED);
+                if (!(B == presionadoVal))
+                    DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? LIGHTGRAY : RED);
+                if (!(C == presionadoVal))
+                    DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? LIGHTGRAY : RED);
+                if (!(D == presionadoVal))
+                    DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? LIGHTGRAY : RED);
+                char PPunt[4];
+                sprintf(PPunt,"%d",puntuacion);
+                DrawText(PPunt,40,600,30,BLACK);
             }
             else
             {
