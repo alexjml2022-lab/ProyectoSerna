@@ -14,10 +14,3 @@ struct formatoPregunta
     formatoPregunta *sig;
     formatoPregunta *ant;
 };
-
-enum PE{
-    PREGUNTA, 
-    REPUESTA,
-    RC,//Respuetsa correcta
-    PUNTAJE
-};

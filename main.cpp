@@ -92,16 +92,37 @@ int main()
         case APLICAR:
             formatoPregunta *lista = new formatoPregunta;
             cargar(lista);
+            int presionado;
             if (IsKeyPressed(KEY_LEFT))
             {
-                /* code */
+                if (lista->ant != NULL)
+                {
+                    lista = lista->ant;
+                    presionado = -1;
+                }
             }
             else if (IsKeyPressed(KEY_RIGHT))
             {
-                /* code */
+                if (lista->sig != NULL)
+                {
+                    lista = lista->sig;
+                    presionado = -1;
+                }
             }
-            
-            
+            int puntuacion = 0;
+            int rSelect;
+
+            if (rSelect == 1)
+            {
+                puntuacion += lista->puntajeAsignado;
+                presionado = 1;
+            }
+            else if (rSelect == 0)
+            {
+                puntuacion -= lista->puntajeAsignado;
+                presionado = 0;
+            }
+
             break;
 
         case GENERAR:
@@ -202,7 +223,8 @@ int main()
             break;
 
         case APLICAR:
-
+            DrawTitleCentered("Examen", 30, 32, GREEN);
+            DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 50, 75, 16, DARKGRAY);
             break;
 
         case GENERAR:
