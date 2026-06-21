@@ -55,6 +55,7 @@ int main()
     Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
     Rectangle botonGuardarYSalir = {(float)(screenWidth / 4 - 125), 700, 250, 50};
     Rectangle botonGuardarYSiguiente = {(float)((screenWidth / 4 - 125) * 8), 700, 250, 50};
+    Rectangle botonOpcA= {(float)((screenWidth / 4 - 125)), 200, 250, 50};;
 
     while (!WindowShouldClose())
     {
@@ -66,7 +67,7 @@ int main()
         bool ratonSobreCalificar = CheckCollisionPointRec(ratonPos, botonCalificar);
         bool ratonSobreGuardarYSalir = CheckCollisionPointRec(ratonPos, botonGuardarYSalir);
         bool ratonSobreGuardarYSiguiente = CheckCollisionPointRec(ratonPos, botonGuardarYSiguiente);
-
+        formatoPregunta *lista = new formatoPregunta;
         switch (estadoJ)
         {
         case MENU:
@@ -90,15 +91,16 @@ int main()
             break;
 
         case APLICAR:
-            formatoPregunta *lista = new formatoPregunta;
+
             cargar(lista);
-            int presionado;
+            int presionadoVal, numP = 1;
             if (IsKeyPressed(KEY_LEFT))
             {
                 if (lista->ant != NULL)
                 {
                     lista = lista->ant;
-                    presionado = -1;
+                    presionadoVal = -1;
+                    numP++;
                 }
             }
             else if (IsKeyPressed(KEY_RIGHT))
@@ -106,23 +108,29 @@ int main()
                 if (lista->sig != NULL)
                 {
                     lista = lista->sig;
-                    presionado = -1;
+                    presionadoVal = -1;
+                    numP--;
                 }
             }
             int puntuacion = 0;
             int rSelect;
 
-            if (rSelect == 1)
+            if (rSelect == 1 && presionadoVal == 0)
             {
+
                 puntuacion += lista->puntajeAsignado;
-                presionado = 1;
+                presionadoVal = 1;
             }
-            else if (rSelect == 0)
+            else if (rSelect == 0 && presionadoVal == 1)
             {
                 puntuacion -= lista->puntajeAsignado;
-                presionado = 0;
+                presionadoVal = 0;
             }
-
+            if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                CloseWindow();
+                return 0;
+            }
             break;
 
         case GENERAR:
@@ -225,6 +233,9 @@ int main()
         case APLICAR:
             DrawTitleCentered("Examen", 30, 32, GREEN);
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 50, 75, 16, DARKGRAY);
+            DrawText(lista->pregunta, 55, 150, 20, BLACK);
+            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? LIGHTGRAY : RED);
+            DrawTextCentered("Salir", botonSalir, 28, WHITE);
             break;
 
         case GENERAR:
