@@ -1,8 +1,8 @@
 #include "ApEx.h++"
 
-formatoPregunta *cargar()
+formatoPregunta *cargar(const char *WMCY)
 {
-    FILE *examen = fopen("examen.txt", "r");
+    FILE *examen = fopen(WMCY, "r");
     if (examen == NULL)
     {
         return NULL;

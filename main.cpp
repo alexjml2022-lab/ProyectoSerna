@@ -3,11 +3,12 @@
 enum estados
 {
     MENU,
+    SELEX,
     APLICAR,
     GENERAR,
     MODIFICAR,
-    SALIR,
-    GEE
+    SALIR
+
 };
 void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color)
 {
@@ -30,6 +31,9 @@ int main()
     InitWindow(screenWidth, screenHeight, "Exams");
     SetTargetFPS(60);
     estados estadoJ = MENU;
+    char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
+    int letrasExamen = 0;         // Contador de caracteres para el nombre
+    int subModo = 0;
 
     // variables para generar preguntas
 
@@ -51,7 +55,7 @@ int main()
     formatoPregunta *preguntaActual = NULL;
     int numP = 1;
     int puntuacion = 0, puntuacionTot = 0;
-    bool calificar = false;
+    bool calificar = false, calificacion = false;
 
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
@@ -70,8 +74,9 @@ int main()
     Rectangle botonOpcC = {70, 220 + (2 * 40), 20, 25};
     Rectangle botonOpcD = {70, 220 + (3 * 40), 20, 25};
 
-    // botonRegresar
+    // botones epseciales
     Rectangle botonRegresar = {(float)(screenWidth / 3 - 125), 550, 250, 50};
+    Rectangle botonContinuar = {(float)(screenWidth / 2 - 125), 450, 250, 50};
 
     while (!WindowShouldClose())
     {
@@ -93,41 +98,26 @@ int main()
         bool ratonSobreOpcC = CheckCollisionPointRec(ratonPos, botonOpcC);
         bool ratonSobreOpcD = CheckCollisionPointRec(ratonPos, botonOpcD);
 
-        //--Regresar--
+        //--Especiales--
         bool ratonSobreRegresar = CheckCollisionPointRec(ratonPos, botonRegresar);
+        bool ratonSobreContinuar = CheckCollisionPointRec(ratonPos, botonContinuar);
 
         switch (estadoJ)
         {
         case MENU:
             if (ratonSobreAplicar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                while (lista != NULL)
-                {
-                    formatoPregunta *aux = lista;
-                    lista = lista->sig;
-                    delete aux;
-                }
-                lista = NULL;
-
-                lista = cargar();
-                puntuacion = 0;
-                puntuacionTot = 0;
-                if (lista != NULL)
-                {
-                    formatoPregunta *aux = lista;
-                    while (aux != NULL)
-                    {
-                        puntuacionTot += aux->puntajeAsignado;
-                        aux = aux->sig;
-                    }
-                    preguntaActual = lista;
-                    numP = 1;
-                    estadoJ = APLICAR;
-                }
+                subModo = 1; // Guardamos que queremos Aplicar
+                nombreExamen[0] = '\0';
+                letrasExamen = 0;
+                estadoJ = SELEX; // Vamos a la pantalla de escribir nombre
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                estadoJ = GENERAR;
+                subModo = 2; // Guardamos que queremos Generar
+                nombreExamen[0] = '\0';
+                letrasExamen = 0;
+                estadoJ = SELEX; // Vamos a la pantalla de escribir nombre
             }
             if (ratonSobreModificar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
@@ -141,8 +131,80 @@ int main()
 
             break;
 
+        case SELEX:
+        {
+            int key = GetCharPressed();
+            while (key > 0)
+            {
+                if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9') || key == '_')
+                {
+                    if (letrasExamen < 40)
+                    {
+                        nombreExamen[letrasExamen] = (char)key;
+                        nombreExamen[letrasExamen + 1] = '\0';
+                        letrasExamen++;
+                    }
+                }
+                key = GetCharPressed();
+            }
+
+            if (IsKeyPressed(KEY_BACKSPACE) && letrasExamen > 0)
+            {
+                letrasExamen--;
+                nombreExamen[letrasExamen] = '\0';
+            }
+
+            if (ratonSobreContinuar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                if (letrasExamen > 0)
+                {
+                    // Construimos el nombre completo del archivo: "nombre.txt"
+                    char archivoFinal[60];
+                    sprintf(archivoFinal, "%s.txt", nombreExamen);
+
+                    if (subModo == 1) // Modo Aplicar
+                    {
+                        // Limpiamos lista anterior si existe
+                        while (lista != NULL)
+                        {
+                            formatoPregunta *aux = lista;
+                            lista = lista->sig;
+                            delete aux;
+                        }
+                        lista = cargar(archivoFinal); // <--- Usamos el archivo dinámico
+
+                        puntuacion = 0;
+                        puntuacionTot = 0;
+                        if (lista != NULL)
+                        {
+                            formatoPregunta *aux = lista;
+                            while (aux != NULL)
+                            {
+                                puntuacionTot += aux->puntajeAsignado;
+                                aux->opcionSeleccionada = -1;
+                                aux->contestadaCorrecta = false;
+                                aux = aux->sig;
+                            }
+                            preguntaActual = lista;
+                            numP = 1;
+                            estadoJ = APLICAR;
+                            calificacion=false;
+                            calificar=false;
+                        }
+                    }
+                    else if (subModo == 2) // Modo Generar
+                    {
+                        estadoJ = GENERAR;
+                    }
+                }
+            }
+
+            if (IsKeyPressed(KEY_ESCAPE))
+                estadoJ = MENU; // Opción para cancelar
+            break;
+        }
         case APLICAR:
-            if (preguntaActual != NULL)
+            if (preguntaActual != NULL && calificacion != true)
             {
                 if (IsKeyPressed(KEY_RIGHT))
                 {
@@ -171,6 +233,11 @@ int main()
                         else
                             calificar = false;
                     }
+                }
+
+                if (ratonSobreCalificar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    calificacion = true;
                 }
 
                 Rectangle botonesOpc[4] = {botonOpcA, botonOpcB, botonOpcC, botonOpcD};
@@ -239,17 +306,19 @@ int main()
             {
                 capturaPA(nuevaPregunta);
             }
+            char archivoFinal[60];
+            sprintf(archivoFinal, "%s.txt", nombreExamen);
 
             if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
+                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice, archivoFinal);
                 while (GetCharPressed() > 0)
                     ;
                 estadoJ = MENU;
             }
             if (ratonSobreGuardarYSiguiente && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
+                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice, archivoFinal);
                 while (GetCharPressed() > 0)
                     ;
                 estadoJ = GENERAR;
@@ -306,6 +375,25 @@ int main()
             DrawTextCentered("Salir", botonSalir, 28, WHITE);
             break;
 
+        case SELEX:
+        {
+            DrawTitleCentered("Escribe el nombre del Examen", 150, 28, GREEN);
+            DrawText("No incluyas espacios ni el '.txt'", 180, 210, 18, DARKGRAY);
+
+            // Caja de texto
+            DrawRectangle(150, 260, 400, 50, LIGHTGRAY);
+            DrawRectangleLines(150, 260, 400, 50, DARKGRAY);
+            DrawText(nombreExamen, 170, 272, 24, BLACK);
+
+            // Efecto de cursor parpadeante
+            if ((int)(GetTime() * 2) % 2 == 0)
+                DrawText("_", 170 + MeasureText(nombreExamen, 24), 272, 24, BLACK);
+
+            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? LIGHTGRAY : RED);
+            DrawTextCentered("Continuar", botonContinuar, 24, WHITE);
+            DrawText("Presiona ESC para volver al menú", 210, 520, 16, GRAY);
+            break;
+        }
         case APLICAR:
             DrawTitleCentered("Examen", 30, 32, GREEN);
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, DARKGRAY);
@@ -315,9 +403,9 @@ int main()
                 sprintf(numPP, "%d", numP);
                 DrawText(numPP, 40, 150, 30, BLACK);
                 DrawText(preguntaActual->pregunta, 65, 150, 30, BLACK);
-                char PPunt[4];
-                sprintf(PPunt, "%d", puntuacionTot);
-                DrawText(PPunt, 500, 110, 20, BLACK);
+                char PPuntTot[4];
+                sprintf(PPuntTot, "%d", puntuacionTot);
+                DrawText(PPuntTot, 500, 110, 20, BLACK);
                 DrawText("pts totales", 540, 110, 20, BLACK);
 
                 // Mostrar las opciones leídas de la lista
@@ -338,14 +426,20 @@ int main()
             {
                 DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20, RED);
             }
-            DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? LIGHTGRAY : RED);
-            DrawTextCentered("Regresar", botonRegresar, 28, WHITE);
+
             if (calificar == true)
             {
+                DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? LIGHTGRAY : RED);
+                DrawTextCentered("Regresar", botonRegresar, 28, WHITE);
                 DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? LIGHTGRAY : RED);
                 DrawTextCentered("Calificar", botonCalificar, 28, WHITE);
+                if (calificacion == true)
+                {
+                    char PPunt[4];
+                    sprintf(PPunt, "%d", puntuacion);
+                    DrawText(PPunt, screenWidth / 2, 650, 30, BLACK);
+                }
             }
-
             break;
 
         case GENERAR:

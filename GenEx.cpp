@@ -78,9 +78,9 @@ void capturaPA(formatoPregunta *p)
     }
 }
 
-void guardar(formatoPregunta *p, int &contadorDeCaracteres, int *contadorCaractersR, int &indice)
+void guardar(formatoPregunta *p, int &contadorDeCaracteres, int *contadorCaractersR, int &indice, const char *WMCY)
 {
-    FILE *examen = fopen("examen.txt", "a");
+    FILE *examen = fopen(WMCY, "a");
     if (examen != NULL)
     {
         // Guardamos usando delimitadores de tabulación (\t) perfectos
