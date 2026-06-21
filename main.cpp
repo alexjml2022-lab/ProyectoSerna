@@ -1,4 +1,5 @@
 #include "GenEx.h++"
+#include "ApEx.h++"
 enum estados
 {
     MENU,
@@ -89,7 +90,18 @@ int main()
             break;
 
         case APLICAR:
-
+            formatoPregunta *lista = new formatoPregunta;
+            cargar(lista);
+            if (IsKeyPressed(KEY_LEFT))
+            {
+                /* code */
+            }
+            else if (IsKeyPressed(KEY_RIGHT))
+            {
+                /* code */
+            }
+            
+            
             break;
 
         case GENERAR:
@@ -125,15 +137,14 @@ int main()
 
             if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                guardar(nuevaPregunta, contadorDeCaracteres,  contadorCaractersR,  indice);
+                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
                 estadoJ = MENU;
             }
-            if (ratonSobreGuardarYSiguiente&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            if (ratonSobreGuardarYSiguiente && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                guardar(nuevaPregunta,  contadorDeCaracteres,  contadorCaractersR,  indice);
+                guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
                 estadoJ = GENERAR;
             }
-            
 
             break;
 
