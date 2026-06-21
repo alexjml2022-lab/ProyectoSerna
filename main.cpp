@@ -50,8 +50,8 @@ int main()
     formatoPregunta *preguntaActual = NULL;
     int presionadoVal;
     int numP = 1;
-    int puntuacion = 0;
-    bool rSelect;
+    int puntuacion = 0, puntuacionTot = 0;
+    bool respC = false;
 
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
@@ -104,11 +104,22 @@ int main()
                 lista = NULL;
 
                 lista = cargar();
-                preguntaActual = lista;
-                numP = 1;
-                estadoJ = APLICAR;
-                presionadoVal = -1;
-                puntuacion=0;
+                puntuacion = 0;
+                puntuacionTot = 0;
+                if (lista != NULL)
+                {
+                    formatoPregunta *aux = lista;
+                    while (aux != NULL)
+                    {
+                        puntuacionTot += aux->puntajeAsignado;
+                        aux = aux->sig;
+                    }
+                    preguntaActual = lista;
+                    numP = 1;
+                    estadoJ = APLICAR;
+                    presionadoVal = -1;
+                    respC = false;
+                }
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
@@ -123,10 +134,10 @@ int main()
                 CloseWindow();
                 return 0;
             }
+
             break;
 
         case APLICAR:
-
             if (preguntaActual != NULL) // Validamos con el navegador
             {
                 if (IsKeyPressed(KEY_RIGHT)) // Flecha Derecha va a la SIGUIENTE pregunta
@@ -136,6 +147,7 @@ int main()
                         preguntaActual = preguntaActual->sig;
                         presionadoVal = -1;
                         numP++; // Incrementa el número de pregunta visual
+                        respC = false;
                     }
                 }
                 else if (IsKeyPressed(KEY_LEFT)) // Flecha Izquierda regresa a la ANTERIOR
@@ -145,63 +157,64 @@ int main()
                         preguntaActual = preguntaActual->ant;
                         presionadoVal = -1;
                         numP--; // Decrementa el número de pregunta visual
+                        respC = false;
                     }
                 }
 
-                if (ratonSobreOpcA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                if (ratonSobreOpcA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 0)
                 {
                     presionadoVal = 0;
-                    if (lista->respuestaCorrecta[0] == 1)
+                    if (preguntaActual->respuestaCorrecta[0] == 1 && presionadoVal == 0 && respC == false)
                     {
-                        puntuacion += lista->puntajeAsignado;
-                        rSelect=0;
+                        puntuacion += preguntaActual->puntajeAsignado;
+                        respC = true;
                     }
-                    else if (rSelect == 0 && presionadoVal == 0)
+                    else if (preguntaActual->respuestaCorrecta[0] == 0 && presionadoVal == 0 && respC == true)
                     {
-                        puntuacion -= lista->puntajeAsignado;
-                        rSelect = 1;
+                        puntuacion -= preguntaActual->puntajeAsignado;
+                        respC = false;
                     }
                 }
-                else if (ratonSobreOpcB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                else if (ratonSobreOpcB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 1)
                 {
                     presionadoVal = 1;
-                    if (lista->respuestaCorrecta[1] == 1)
+                    if (preguntaActual->respuestaCorrecta[1] == 1 && presionadoVal == 1 && respC == false)
                     {
-                        puntuacion += lista->puntajeAsignado;
-                        rSelect=0;
+                        puntuacion += preguntaActual->puntajeAsignado;
+                        respC = true;
                     }
-                    else if (rSelect == 0 && presionadoVal == 1)
+                    else if (preguntaActual->respuestaCorrecta[1] == 0 && presionadoVal == 1 && respC == true)
                     {
-                        puntuacion -= lista->puntajeAsignado;
-                        rSelect = 1;
+                        puntuacion -= preguntaActual->puntajeAsignado;
+                        respC = false;
                     }
                 }
-                else if (ratonSobreOpcC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                else if (ratonSobreOpcC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 2)
                 {
                     presionadoVal = 2;
-                    if (lista->respuestaCorrecta[2] == 1)
+                    if (preguntaActual->respuestaCorrecta[2] == 1 && presionadoVal == 2 && respC == false)
                     {
-                        puntuacion += lista->puntajeAsignado;
-                        rSelect=0;
+                        puntuacion += preguntaActual->puntajeAsignado;
+                        respC = true;
                     }
-                    else if (rSelect == 0 && presionadoVal == 2)
+                    else if (preguntaActual->respuestaCorrecta[2] == 0 && presionadoVal == 2 && respC == true)
                     {
-                        puntuacion -= lista->puntajeAsignado;
-                        rSelect = 1;
+                        puntuacion -= preguntaActual->puntajeAsignado;
+                        respC = false;
                     }
                 }
-                else if (ratonSobreOpcD && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                else if (ratonSobreOpcD && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 3)
                 {
                     presionadoVal = 3;
-                    if (lista->respuestaCorrecta[3] == 1)
+                    if (preguntaActual->respuestaCorrecta[3] == 1 && presionadoVal == 3 && respC == false)
                     {
-                        puntuacion += lista->puntajeAsignado;
-                        rSelect=0;
+                        puntuacion += preguntaActual->puntajeAsignado;
+                        respC = true;
                     }
-                    else if (rSelect == 0 && presionadoVal == 3)
+                    else if (preguntaActual->respuestaCorrecta[3] == 0 && presionadoVal == 3 && respC == true)
                     {
-                        puntuacion -= lista->puntajeAsignado;
-                        presionadoVal = 1;
+                        puntuacion -= preguntaActual->puntajeAsignado;
+                        respC = false;
                     }
                 }
             }
@@ -333,8 +346,8 @@ int main()
                 if (!(D == presionadoVal))
                     DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? LIGHTGRAY : RED);
                 char PPunt[4];
-                sprintf(PPunt,"%d",puntuacion);
-                DrawText(PPunt,40,600,30,BLACK);
+                sprintf(PPunt, "%d", puntuacion);
+                DrawText(PPunt, 40, 600, 30, BLACK);
             }
             else
             {
