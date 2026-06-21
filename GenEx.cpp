@@ -1,5 +1,5 @@
 #include "GenEx.h++"
-#include <cstring>
+
 using namespace std;
 
 void capturarPregunta(formatoPregunta *p, int &contadorDeCaracteres)
