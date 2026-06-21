@@ -11,6 +11,8 @@ struct formatoPregunta
     char respuestaTexto[4][99];
     int respuestaCorrecta[4];
     int puntajeAsignado;
+    int opcionSeleccionada = -1; 
+    bool contestadaCorrecta = false;
     formatoPregunta *sig;
     formatoPregunta *ant;
 };

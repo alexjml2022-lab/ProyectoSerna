@@ -6,7 +6,8 @@ enum estados
     APLICAR,
     GENERAR,
     MODIFICAR,
-    SALIR
+    SALIR,
+    GEE
 };
 void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color)
 {
@@ -48,10 +49,9 @@ int main()
     // Variables de aplicar
     formatoPregunta *lista = NULL;
     formatoPregunta *preguntaActual = NULL;
-    int presionadoVal;
     int numP = 1;
     int puntuacion = 0, puntuacionTot = 0;
-    bool respC = false;
+    bool calificar = false;
 
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
@@ -64,11 +64,14 @@ int main()
     Rectangle botonGuardarYSiguiente = {390.0f, 700.0f, 260.0f, 50.0f};
 
     // bototnes aplicar
-    Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
+    Rectangle botonCalificar = {400, 550, 250, 50};
     Rectangle botonOpcA = {70, 220 + (0 * 40), 20, 25};
     Rectangle botonOpcB = {70, 220 + (1 * 40), 20, 25};
     Rectangle botonOpcC = {70, 220 + (2 * 40), 20, 25};
     Rectangle botonOpcD = {70, 220 + (3 * 40), 20, 25};
+
+    // botonRegresar
+    Rectangle botonRegresar = {(float)(screenWidth / 3 - 125), 550, 250, 50};
 
     while (!WindowShouldClose())
     {
@@ -89,6 +92,9 @@ int main()
         bool ratonSobreOpcB = CheckCollisionPointRec(ratonPos, botonOpcB);
         bool ratonSobreOpcC = CheckCollisionPointRec(ratonPos, botonOpcC);
         bool ratonSobreOpcD = CheckCollisionPointRec(ratonPos, botonOpcD);
+
+        //--Regresar--
+        bool ratonSobreRegresar = CheckCollisionPointRec(ratonPos, botonRegresar);
 
         switch (estadoJ)
         {
@@ -117,8 +123,6 @@ int main()
                     preguntaActual = lista;
                     numP = 1;
                     estadoJ = APLICAR;
-                    presionadoVal = -1;
-                    respC = false;
                 }
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -138,88 +142,68 @@ int main()
             break;
 
         case APLICAR:
-            if (preguntaActual != NULL) // Validamos con el navegador
+            if (preguntaActual != NULL)
             {
-                if (IsKeyPressed(KEY_RIGHT)) // Flecha Derecha va a la SIGUIENTE pregunta
+                if (IsKeyPressed(KEY_RIGHT))
                 {
                     if (preguntaActual->sig != NULL)
                     {
                         preguntaActual = preguntaActual->sig;
-                        presionadoVal = -1;
-                        numP++; // Incrementa el número de pregunta visual
-                        respC = false;
+                        numP++;
+                        if (preguntaActual->sig == NULL)
+                        {
+                            calificar = true;
+                        }
+                        else
+                            calificar = false;
                     }
                 }
-                else if (IsKeyPressed(KEY_LEFT)) // Flecha Izquierda regresa a la ANTERIOR
+                else if (IsKeyPressed(KEY_LEFT))
                 {
                     if (preguntaActual->ant != NULL)
                     {
                         preguntaActual = preguntaActual->ant;
-                        presionadoVal = -1;
-                        numP--; // Decrementa el número de pregunta visual
-                        respC = false;
+                        numP--;
+                        if (preguntaActual->sig == NULL)
+                        {
+                            calificar = true;
+                        }
+                        else
+                            calificar = false;
                     }
                 }
 
-                if (ratonSobreOpcA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 0)
+                Rectangle botonesOpc[4] = {botonOpcA, botonOpcB, botonOpcC, botonOpcD};
+
+                for (int i = 0; i < 4; i++)
                 {
-                    presionadoVal = 0;
-                    if (preguntaActual->respuestaCorrecta[0] == 1 && presionadoVal == 0 && respC == false)
+                    if (CheckCollisionPointRec(ratonPos, botonesOpc[i]) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
                     {
-                        puntuacion += preguntaActual->puntajeAsignado;
-                        respC = true;
-                    }
-                    else if (preguntaActual->respuestaCorrecta[0] == 0 && presionadoVal == 0 && respC == true)
-                    {
-                        puntuacion -= preguntaActual->puntajeAsignado;
-                        respC = false;
-                    }
-                }
-                else if (ratonSobreOpcB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 1)
-                {
-                    presionadoVal = 1;
-                    if (preguntaActual->respuestaCorrecta[1] == 1 && presionadoVal == 1 && respC == false)
-                    {
-                        puntuacion += preguntaActual->puntajeAsignado;
-                        respC = true;
-                    }
-                    else if (preguntaActual->respuestaCorrecta[1] == 0 && presionadoVal == 1 && respC == true)
-                    {
-                        puntuacion -= preguntaActual->puntajeAsignado;
-                        respC = false;
-                    }
-                }
-                else if (ratonSobreOpcC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 2)
-                {
-                    presionadoVal = 2;
-                    if (preguntaActual->respuestaCorrecta[2] == 1 && presionadoVal == 2 && respC == false)
-                    {
-                        puntuacion += preguntaActual->puntajeAsignado;
-                        respC = true;
-                    }
-                    else if (preguntaActual->respuestaCorrecta[2] == 0 && presionadoVal == 2 && respC == true)
-                    {
-                        puntuacion -= preguntaActual->puntajeAsignado;
-                        respC = false;
-                    }
-                }
-                else if (ratonSobreOpcD && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && presionadoVal != 3)
-                {
-                    presionadoVal = 3;
-                    if (preguntaActual->respuestaCorrecta[3] == 1 && presionadoVal == 3 && respC == false)
-                    {
-                        puntuacion += preguntaActual->puntajeAsignado;
-                        respC = true;
-                    }
-                    else if (preguntaActual->respuestaCorrecta[3] == 0 && presionadoVal == 3 && respC == true)
-                    {
-                        puntuacion -= preguntaActual->puntajeAsignado;
-                        respC = false;
+                        // Comparamos contra la opción seleccionada DE ESTA PREGUNTA específicamente
+                        if (preguntaActual->opcionSeleccionada != i)
+                        {
+                            // 1. Si ya estaba contestada correctamente, restamos los puntos antes de cambiar
+                            if (preguntaActual->contestadaCorrecta)
+                            {
+                                puntuacion -= preguntaActual->puntajeAsignado;
+                                preguntaActual->contestadaCorrecta = false;
+                            }
+
+                            // 2. Registramos la NUEVA opción en esta pregunta
+                            preguntaActual->opcionSeleccionada = i;
+
+                            // 3. Si la nueva opción es la correcta, sumamos el puntaje
+                            if (preguntaActual->respuestaCorrecta[i] == 1)
+                            {
+                                puntuacion += preguntaActual->puntajeAsignado;
+                                preguntaActual->contestadaCorrecta = true;
+                            }
+                        }
                     }
                 }
             }
 
-            if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            if (ratonSobreRegresar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 estadoJ = MENU;
             }
@@ -324,42 +308,49 @@ int main()
 
         case APLICAR:
             DrawTitleCentered("Examen", 30, 32, GREEN);
-            DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 50, 75, 16, DARKGRAY);
+            DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, DARKGRAY);
             if (preguntaActual != NULL) // Cambiado a preguntaActual
             {
-                char numPP[0];
+                char numPP[4];
                 sprintf(numPP, "%d", numP);
                 DrawText(numPP, 40, 150, 30, BLACK);
                 DrawText(preguntaActual->pregunta, 65, 150, 30, BLACK);
+                char PPunt[4];
+                sprintf(PPunt, "%d", puntuacionTot);
+                DrawText(PPunt, 500, 110, 20, BLACK);
+                DrawText("pts totales", 540, 110, 20, BLACK);
 
                 // Mostrar las opciones leídas de la lista
                 for (int i = 0; i < 4; i++)
                 {
                     DrawText(preguntaActual->respuestaTexto[i], 150, 220 + (i * 40), 20, DARKGRAY);
                 }
-                if (!(A == presionadoVal))
+                if (preguntaActual->opcionSeleccionada != 0)
                     DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? LIGHTGRAY : RED);
-                if (!(B == presionadoVal))
+                if (preguntaActual->opcionSeleccionada != 1)
                     DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? LIGHTGRAY : RED);
-                if (!(C == presionadoVal))
+                if (preguntaActual->opcionSeleccionada != 2)
                     DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? LIGHTGRAY : RED);
-                if (!(D == presionadoVal))
+                if (preguntaActual->opcionSeleccionada != 3)
                     DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? LIGHTGRAY : RED);
-                char PPunt[4];
-                sprintf(PPunt, "%d", puntuacion);
-                DrawText(PPunt, 40, 600, 30, BLACK);
             }
             else
             {
                 DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20, RED);
             }
-            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? LIGHTGRAY : RED);
-            DrawTextCentered("Regresar", botonSalir, 28, WHITE);
+            DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? LIGHTGRAY : RED);
+            DrawTextCentered("Regresar", botonRegresar, 28, WHITE);
+            if (calificar == true)
+            {
+                DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? LIGHTGRAY : RED);
+                DrawTextCentered("Calificar", botonCalificar, 28, WHITE);
+            }
+
             break;
 
         case GENERAR:
             DrawTitleCentered("Creador de Preguntas", 30, 32, GREEN);
-            DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 16, DARKGRAY);
+            DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 20, DARKGRAY);
 
             DrawText("Pregunta:", 50, 110, 18, BLACK);
             DrawRectangle(50, 135, 600, 35, LIGHTGRAY);
