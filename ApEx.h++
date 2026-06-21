@@ -1,5 +1,5 @@
 #pragma once
 #include "formato.h++"
 
-void cargar(formatoPregunta *&);
+formatoPregunta *cargar();
 void pushBack(formatoPregunta *&, formatoPregunta *);

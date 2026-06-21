@@ -1,11 +1,2 @@
-Pregunta: 
-Opcion A:  [INCORRECTA]
-Opcion B:  [INCORRECTA]
-Opcion C:  [INCORRECTA]
-Opcion D:  [INCORRECTA]
-Puntaje asignado: 0
-Pregunta: ythnhy	Opcion A: yh [INCORRECTA]	Opcion B: yht [INCORRECTA]	Opcion C: yht [INCORRECTA]	Opcion D: yth [CORRECTA]	Puntaje asignado: 3
-Pregunta: rtegewg	Opcion A: weffr [CORRECTA]	Opcion B: 43r [INCORRECTA]	Opcion C: rfe [INCORRECTA]	Opcion D: tr [INCORRECTA]	Puntaje asignado: 6
-Pregunta: jkhjhkyutkm	Opcion A: yujkt [INCORRECTA]	Opcion B: 7uj [INCORRECTA]	Opcion C: ki7uy [CORRECTA]	Opcion D: injmuyt [INCORRECTA]	Puntaje asignado: 7
-Pregunta: yjm	Opcion A: jmuy [INCORRECTA]	Opcion B: ,,myui [CORRECTA]	Opcion C: terftgv [INCORRECTA]	Opcion D: uyjt [INCORRECTA]	Puntaje asignado: 1
-Pregunta: Prubeba funcion G	Opcion A: fv [CORRECTA]	Opcion B: grb [INCORRECTA]	Opcion C: grb [INCORRECTA]	Opcion D: vgr1 [INCORRECTA]	Puntaje asignado: 1
+Pregunta:prueba ap	OpcionA:dv 	CORRECTA	OpcionB:rgv	INCORRECTA	OpcionC:tbgh	INCORRECTA	OpcionD:grbfa	INCORRECTA	Puntaje:4
+Pregunta:regref	OpcionA:wefq	CORRECTA	OpcionB:rewf	INCORRECTA	OpcionC:fwer	INCORRECTA	OpcionD:ferwq	INCORRECTA	Puntaje:6

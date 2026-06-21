@@ -19,7 +19,7 @@ void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color
 void DrawTitleCentered(const char *text, int y, int fontSize, Color color)
 {
     int textWidth = MeasureText(text, fontSize);
-    int textX = (500 - textWidth) / 2;
+    int textX = (700 - textWidth) / 2;
     DrawText(text, textX, y, fontSize, color);
 }
 int main()
@@ -31,6 +31,7 @@ int main()
     estados estadoJ = MENU;
 
     // variables para generar preguntas
+
     formatoPregunta *nuevaPregunta;
     nuevaPregunta = new formatoPregunta;
     for (int i = 0; i < 4; i++)
@@ -40,10 +41,16 @@ int main()
         nuevaPregunta->respuestaCorrecta[i] = 0;
     }
     nuevaPregunta->puntajeAsignado = 0;
-
     int contadorDeCaracteres = 0;
     int contadorCaractersR[4] = {0, 0, 0, 0};
     int indice = -1;
+
+    // Variables de aplicar
+    formatoPregunta *lista = NULL;
+    formatoPregunta *preguntaActual = NULL;
+    int presionadoVal;
+    int numP = 1;
+    int puntuacion = 0;
 
     //  Botones del menu
     Rectangle botonAplicar = {(float)(screenWidth / 2 - 125), 250, 250, 50};
@@ -53,9 +60,9 @@ int main()
 
     // Botones extras
     Rectangle botonCalificar = {(float)(screenWidth / 2 - 125), 550, 250, 50};
-    Rectangle botonGuardarYSalir = {(float)(screenWidth / 4 - 125), 700, 250, 50};
-    Rectangle botonGuardarYSiguiente = {(float)((screenWidth / 4 - 125) * 8), 700, 250, 50};
-    Rectangle botonOpcA= {(float)((screenWidth / 4 - 125)), 200, 250, 50};;
+    Rectangle botonGuardarYSalir = {50.0f, 700.0f, 260.0f, 50.0f};
+    Rectangle botonGuardarYSiguiente = {390.0f, 700.0f, 260.0f, 50.0f};
+    Rectangle botonOpcA= {(float)((screenWidth / 4 - 125)), 200, 250, 50};
 
     while (!WindowShouldClose())
     {
@@ -67,12 +74,23 @@ int main()
         bool ratonSobreCalificar = CheckCollisionPointRec(ratonPos, botonCalificar);
         bool ratonSobreGuardarYSalir = CheckCollisionPointRec(ratonPos, botonGuardarYSalir);
         bool ratonSobreGuardarYSiguiente = CheckCollisionPointRec(ratonPos, botonGuardarYSiguiente);
-        formatoPregunta *lista = new formatoPregunta;
+
         switch (estadoJ)
         {
         case MENU:
             if (ratonSobreAplicar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
+                while (lista != NULL)
+                {
+                    formatoPregunta *aux = lista;
+                    lista = lista->sig;
+                    delete aux;
+                }
+                lista = NULL;
+
+                lista = cargar();
+                preguntaActual = lista;
+                numP = 1;
                 estadoJ = APLICAR;
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -92,44 +110,46 @@ int main()
 
         case APLICAR:
 
-            cargar(lista);
-            int presionadoVal, numP = 1;
-            if (IsKeyPressed(KEY_LEFT))
-            {
-                if (lista->ant != NULL)
-                {
-                    lista = lista->ant;
-                    presionadoVal = -1;
-                    numP++;
-                }
-            }
-            else if (IsKeyPressed(KEY_RIGHT))
-            {
-                if (lista->sig != NULL)
-                {
-                    lista = lista->sig;
-                    presionadoVal = -1;
-                    numP--;
-                }
-            }
-            int puntuacion = 0;
             int rSelect;
-
-            if (rSelect == 1 && presionadoVal == 0)
+            if (preguntaActual != NULL) // Validamos con el navegador
             {
+                if (IsKeyPressed(KEY_RIGHT)) // Flecha Derecha va a la SIGUIENTE pregunta
+                {
+                    if (preguntaActual->sig != NULL)
+                    {
+                        preguntaActual = preguntaActual->sig;
+                        presionadoVal = -1;
+                        numP++; // Incrementa el número de pregunta visual
+                    }
+                }
+                else if (IsKeyPressed(KEY_LEFT)) // Flecha Izquierda regresa a la ANTERIOR
+                {
+                    if (preguntaActual->ant != NULL)
+                    {
+                        preguntaActual = preguntaActual->ant;
+                        presionadoVal = -1;
+                        numP--; // Decrementa el número de pregunta visual
+                    }
+                }
 
-                puntuacion += lista->puntajeAsignado;
-                presionadoVal = 1;
+                /*
+                if (rSelect == 1 && presionadoVal == 0)
+                {
+
+                    puntuacion += lista->puntajeAsignado;
+                    presionadoVal = 1;
+                }
+                else if (rSelect == 0 && presionadoVal == 1)
+                {
+                    puntuacion -= lista->puntajeAsignado;
+                    presionadoVal = 0;
+                }
+                    */
             }
-            else if (rSelect == 0 && presionadoVal == 1)
-            {
-                puntuacion -= lista->puntajeAsignado;
-                presionadoVal = 0;
-            }
+
             if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                CloseWindow();
-                return 0;
+                estadoJ = MENU;
             }
             break;
 
@@ -167,17 +187,17 @@ int main()
             if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
+                while (GetCharPressed() > 0)
+                    ;
                 estadoJ = MENU;
             }
             if (ratonSobreGuardarYSiguiente && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 guardar(nuevaPregunta, contadorDeCaracteres, contadorCaractersR, indice);
+                while (GetCharPressed() > 0)
+                    ;
                 estadoJ = GENERAR;
             }
-
-            break;
-
-        default:
             break;
         }
         //--dibujar--
@@ -233,9 +253,22 @@ int main()
         case APLICAR:
             DrawTitleCentered("Examen", 30, 32, GREEN);
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 50, 75, 16, DARKGRAY);
-            DrawText(lista->pregunta, 55, 150, 20, BLACK);
+            if (preguntaActual != NULL) // Cambiado a preguntaActual
+            {
+                DrawText(preguntaActual->pregunta, 55, 150, 20, BLACK);
+
+                // Mostrar las opciones leídas de la lista
+                for (int i = 0; i < 4; i++)
+                {
+                    DrawText(preguntaActual->respuestaTexto[i], 70, 220 + (i * 40), 18, DARKGRAY);
+                }
+            }
+            else
+            {
+                DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20, RED);
+            }
             DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? LIGHTGRAY : RED);
-            DrawTextCentered("Salir", botonSalir, 28, WHITE);
+            DrawTextCentered("Regresar", botonSalir, 28, WHITE);
             break;
 
         case GENERAR:
@@ -289,6 +322,13 @@ int main()
 
         EndDrawing();
     }
+    while (lista != NULL)
+    {
+        formatoPregunta *aux = lista;
+        lista = lista->sig;
+        delete aux;
+    }
+    delete nuevaPregunta;
     CloseWindow();
     return 0;
 }

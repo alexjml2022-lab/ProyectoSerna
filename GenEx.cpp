@@ -83,12 +83,16 @@ void guardar(formatoPregunta *p, int &contadorDeCaracteres, int *contadorCaracte
     FILE *examen = fopen("examen.txt", "a");
     if (examen != NULL)
     {
-        fprintf(examen, "Pregunta: %s\t", p->pregunta);
+        // Guardamos usando delimitadores de tabulación (\t) perfectos
+        fprintf(examen, "Pregunta:%s\t", p->pregunta);
         for (int i = 0; i < 4; i++)
         {
-            fprintf(examen, "Opcion %c: %s [%s]\t", 'A' + i, p->respuestaTexto[i], (p->respuestaCorrecta[i] == 1) ? "CORRECTA" : "INCORRECTA");
+            fprintf(examen, "Opcion%c:%s\t%s\t",
+                    'A' + i,
+                    p->respuestaTexto[i],
+                    (p->respuestaCorrecta[i] == 1) ? "CORRECTA" : "INCORRECTA");
         }
-        fprintf(examen, "Puntaje asignado: %d\n", p->puntajeAsignado);
+        fprintf(examen, "Puntaje:%d\n", p->puntajeAsignado);
         fclose(examen);
     }
     p->pregunta[0] = '\0';

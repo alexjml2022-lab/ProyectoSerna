@@ -1,19 +1,38 @@
 #include "ApEx.h++"
 
-void cargar(formatoPregunta *&lista)
+formatoPregunta *cargar()
 {
     FILE *examen = fopen("examen.txt", "r");
     if (examen == NULL)
     {
-        return;
+        return NULL;
     }
+
+    formatoPregunta *listaLocal = NULL;
+    char linea[1024];
+
     char preg[300], respA[99], respB[99], respC[99], respD[99];
     char correctaA[20], correctaB[20], correctaC[20], correctaD[20];
     int valor;
-    while (fscanf(examen,
-                  "Pregunta: %299[^\t]\tOpcion A: %98[^\t] [%19[^]]]\tOpcion B: %98[^\t] [%19[^]]]\tOpcion C: %98[^\t] [%19[^]]]\tOpcion D: %98[^\t] [%19[^]]]\tPuntaje asignado: %d\n",
-                  preg, respA, correctaA, respB, correctaB, respC, correctaC, respD, correctaD, valor) != EOF)
+
+    while (fgets(linea, sizeof(linea), examen) != NULL)
     {
+        // Esta máscara extrae todo lo que esté entre los tabuladores sin importar los espacios internos
+        int camposLeidos = sscanf(linea,
+                                  "Pregunta:%299[^\t]\tOpcionA:%98[^\t]\t%19[^\t]\tOpcionB:%98[^\t]\t%19[^\t]\tOpcionC:%98[^\t]\t%19[^\t]\tOpcionD:%98[^\t]\t%19[^\t]\tPuntaje:%d",
+                                  preg,
+                                  respA, correctaA,
+                                  respB, correctaB,
+                                  respC, correctaC,
+                                  respD, correctaD,
+                                  &valor);
+
+        // Si la línea no coincide con el nuevo formato estandarizado, la salta
+        if (camposLeidos < 10)
+        {
+            continue;
+        }
+
         formatoPregunta *p = new formatoPregunta;
         strcpy(p->pregunta, preg);
         strcpy(p->respuestaTexto[0], respA);
@@ -30,9 +49,11 @@ void cargar(formatoPregunta *&lista)
         p->ant = NULL;
         p->sig = NULL;
 
-        pushBack(lista, p);
+        pushBack(listaLocal, p);
     }
+
     fclose(examen);
+    return listaLocal;
 }
 
 void pushBack(formatoPregunta *&lista, formatoPregunta *p)
