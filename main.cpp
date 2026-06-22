@@ -1,5 +1,6 @@
 #include "GenEx.h++"
 #include "ApEx.h++"
+#include "colores.h"
 enum estados
 {
     MENU,
@@ -24,13 +25,18 @@ void DrawTitleCentered(const char *text, int y, int fontSize, Color color)
     int textX = (700 - textWidth) / 2;
     DrawText(text, textX, y, fontSize, color);
 }
+using namespace baldiColores;
 int main()
 {
     const int screenWidth = 700;
     const int screenHeight = 800;
     InitWindow(screenWidth, screenHeight, "Exams");
+    Image icono = LoadImage("public/baldi.png");
+    SetWindowIcon(icono);
+    UnloadImage(icono);
     SetTargetFPS(60);
     estados estadoJ = MENU;
+
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
     int letrasExamen = 0;         // Contador de caracteres para el nombre
     int subModo = 0;
@@ -121,7 +127,10 @@ int main()
             }
             if (ratonSobreModificar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                estadoJ = MODIFICAR;
+                subModo = 3;
+                nombreExamen[0] = '\0';
+                letrasExamen = 0;
+                estadoJ = SELEX;
             }
             if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
@@ -188,13 +197,17 @@ int main()
                             preguntaActual = lista;
                             numP = 1;
                             estadoJ = APLICAR;
-                            calificacion=false;
-                            calificar=false;
+                            calificacion = false;
+                            calificar = false;
                         }
                     }
                     else if (subModo == 2) // Modo Generar
                     {
                         estadoJ = GENERAR;
+                    }
+                    else if (subModo == 3)
+                    {
+                        estadoJ = MODIFICAR;
                     }
                 }
             }
@@ -359,19 +372,19 @@ int main()
         case MENU:
             DrawTitleCentered("Exams", 100, 50, GREEN);
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? LIGHTGRAY : RED);
+            DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? BALDI_SKIN :BALDI_BLUE);
             DrawTextCentered("Aplicar", botonAplicar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? LIGHTGRAY : RED);
+            DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? BALDI_SKIN :BALDI_BLUE);
             DrawTextCentered("Generar", botonGenerar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonModificar, 0.3f, 6, ratonSobreModificar ? LIGHTGRAY : RED);
+            DrawRectangleRounded(botonModificar, 0.3f, 6, ratonSobreModificar ? BALDI_SKIN :BALDI_BLUE);
             DrawTextCentered("Modificar", botonModificar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? LIGHTGRAY : RED);
+            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? BALDI_SKIN :BALDI_BLUE);
             DrawTextCentered("Salir", botonSalir, 28, WHITE);
             break;
 
@@ -381,7 +394,7 @@ int main()
             DrawText("No incluyas espacios ni el '.txt'", 180, 210, 18, DARKGRAY);
 
             // Caja de texto
-            DrawRectangle(150, 260, 400, 50, LIGHTGRAY);
+            DrawRectangle(150, 260, 400, 50, BALDI_SKIN);
             DrawRectangleLines(150, 260, 400, 50, DARKGRAY);
             DrawText(nombreExamen, 170, 272, 24, BLACK);
 
@@ -389,7 +402,7 @@ int main()
             if ((int)(GetTime() * 2) % 2 == 0)
                 DrawText("_", 170 + MeasureText(nombreExamen, 24), 272, 24, BLACK);
 
-            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? LIGHTGRAY : RED);
+            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? BALDI_SKIN :BALDI_BLUE);
             DrawTextCentered("Continuar", botonContinuar, 24, WHITE);
             DrawText("Presiona ESC para volver al menú", 210, 520, 16, GRAY);
             break;
@@ -414,24 +427,24 @@ int main()
                     DrawText(preguntaActual->respuestaTexto[i], 150, 220 + (i * 40), 20, DARKGRAY);
                 }
                 if (preguntaActual->opcionSeleccionada != 0)
-                    DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? LIGHTGRAY : RED);
+                    DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? BALDI_SKIN :BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 1)
-                    DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? LIGHTGRAY : RED);
+                    DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? BALDI_SKIN :BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 2)
-                    DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? LIGHTGRAY : RED);
+                    DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? BALDI_SKIN :BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 3)
-                    DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? LIGHTGRAY : RED);
+                    DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? BALDI_SKIN :BALDI_BLUE);
             }
             else
             {
-                DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20, RED);
+                DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20,BALDI_BLUE);
             }
 
             if (calificar == true)
             {
-                DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? LIGHTGRAY : RED);
+                DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? BALDI_SKIN :BALDI_BLUE);
                 DrawTextCentered("Regresar", botonRegresar, 28, WHITE);
-                DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? LIGHTGRAY : RED);
+                DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? BALDI_SKIN :BALDI_BLUE);
                 DrawTextCentered("Calificar", botonCalificar, 28, WHITE);
                 if (calificacion == true)
                 {
@@ -447,7 +460,7 @@ int main()
             DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 20, DARKGRAY);
 
             DrawText("Pregunta:", 50, 110, 18, BLACK);
-            DrawRectangle(50, 135, 600, 35, LIGHTGRAY);
+            DrawRectangle(50, 135, 600, 35, BALDI_SKIN);
             DrawText(nuevaPregunta->pregunta, 60, 142, 18, BLACK);
             if (indice == -1 && (int)(GetTime() * 2) % 2 == 0)
                 DrawText("_", 60 + MeasureText(nuevaPregunta->pregunta, 18), 142, 18, BLACK);
@@ -459,7 +472,7 @@ int main()
 
                 char prefijo[12] = {'O', 'p', 'c', 'i', 'o', 'n', ' ', (char)('A' + i), ':', '\0'};
                 DrawText(prefijo, 50, posYLabel, 18, BLACK);
-                DrawRectangle(50, posYBox, 600, 35, LIGHTGRAY);
+                DrawRectangle(50, posYBox, 600, 35, BALDI_SKIN);
                 DrawText(nuevaPregunta->respuestaTexto[i], 60, posYBox + 7, 18, BLACK);
 
                 if (indice == i && (int)(GetTime() * 2) % 2 == 0)
@@ -467,7 +480,7 @@ int main()
             }
 
             DrawText("Presiona la tecla (A, B, C, D) para la respuesta correcta:", 50, 495, 18, BLACK);
-            DrawRectangle(50, 520, 200, 35, LIGHTGRAY);
+            DrawRectangle(50, 520, 200, 35, BALDI_SKIN);
 
             char opcCorr[2] = {'-', '\0'};
             for (int i = 0; i < 4; i++)
@@ -478,7 +491,7 @@ int main()
             DrawText(opcCorr, 140, 527, 20, BLACK);
 
             DrawText("Asigna un puntaje (Tecla num. 0-9):", 50, 570, 18, BLACK);
-            DrawRectangle(50, 595, 200, 35, LIGHTGRAY);
+            DrawRectangle(50, 595, 200, 35, BALDI_SKIN);
 
             char puntajeTxt[4];
             sprintf(puntajeTxt, "%d", nuevaPregunta->puntajeAsignado);

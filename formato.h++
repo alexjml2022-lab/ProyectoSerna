@@ -15,6 +15,3 @@ struct formatoPregunta
     formatoPregunta *sig;
     formatoPregunta *ant;
 };
-enum OPC{
-    A,B,C,D
-};
