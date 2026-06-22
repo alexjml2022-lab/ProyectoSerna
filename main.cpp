@@ -38,6 +38,7 @@ int main()
     Texture2D fondoMenu = LoadTexture("public/schoolIn.jpg");
     estados estadoJ = MENU;
 
+    // variables para selex
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
     int letrasExamen = 0;         // Contador de caracteres para el nombre
     int subModo = 0;
@@ -196,10 +197,10 @@ int main()
                                 aux = aux->sig;
                             }
                             preguntaActual = lista;
-                            numP = 1;
-                            estadoJ = APLICAR;
                             calificacion = false;
                             calificar = false;
+                            numP = 1;
+                            estadoJ = APLICAR;
                         }
                     }
                     else if (subModo == 2) // Modo Generar
@@ -213,8 +214,6 @@ int main()
                 }
             }
 
-            if (IsKeyPressed(KEY_ESCAPE))
-                estadoJ = MENU; // Opción para cancelar
             break;
         }
         case APLICAR:
@@ -374,7 +373,7 @@ int main()
         switch (estadoJ)
         {
         case MENU:
-            DrawTitleCentered("Exams", 20,70, BALDI_RED);
+            DrawTitleCentered("Exams", 20, 70, BALDI_RED);
             //----------------Boton aplicar--------------
             DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Aplicar", botonAplicar, 28, WHITE);
@@ -395,7 +394,7 @@ int main()
         case SELEX:
         {
             DrawTitleCentered("Escribe el nombre del Examen", 30, 40, BALDI_RED);
-            DrawTitleCentered("No incluyas espacios ni el '.txt'",220, 28, BLACK);
+            DrawTitleCentered("No incluyas espacios ni el '.txt'", 220, 28, BLACK);
 
             // Caja de texto
             DrawRectangle(150, 260, 400, 50, BALDI_SKIN);
@@ -413,7 +412,7 @@ int main()
         case APLICAR:
             DrawTitleCentered("Examen", 20, 38, BALDI_RED);
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, BLACK);
-            if (preguntaActual != NULL) // Cambiado a preguntaActual
+            if (preguntaActual != NULL)
             {
                 char numPP[4];
                 sprintf(numPP, "%d", numP);
@@ -453,7 +452,7 @@ int main()
                 {
                     char PPunt[4];
                     sprintf(PPunt, "%d", puntuacion);
-                    DrawText("Puntuacion: ",screenWidth/2-180,750,30,BLACK);
+                    DrawText("Puntuacion: ", screenWidth / 2 - 180, 750, 30, BLACK);
                     DrawText(PPunt, screenWidth / 2, 750, 30, BLACK);
                 }
             }
@@ -505,6 +504,9 @@ int main()
             DrawTextCentered("Guardar y salir", botonGuardarYSalir, 24, WHITE);
             DrawRectangleRounded(botonGuardarYSiguiente, 0.3f, 6, ratonSobreGuardarYSiguiente ? DARKGREEN : GREEN);
             DrawTextCentered("Guardar y siguiente", botonGuardarYSiguiente, 24, WHITE);
+            break;
+        case MODIFICAR:
+        
             break;
         }
 
