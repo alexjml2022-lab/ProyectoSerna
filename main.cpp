@@ -35,6 +35,7 @@ int main()
     SetWindowIcon(icono);
     UnloadImage(icono);
     SetTargetFPS(60);
+    Texture2D fondoMenu = LoadTexture("public/schoolIn.jpg");
     estados estadoJ = MENU;
 
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
@@ -338,8 +339,11 @@ int main()
             }
             break;
         }
+
         //--dibujar--
         BeginDrawing();
+
+        DrawTexture(fondoMenu, -410, -200, WHITE);
         ClearBackground(WHITE);
         if (estadoJ == MENU)
         {
@@ -370,28 +374,28 @@ int main()
         switch (estadoJ)
         {
         case MENU:
-            DrawTitleCentered("Exams", 100, 50, GREEN);
+            DrawTitleCentered("Exams", 20,70, BALDI_RED);
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? BALDI_SKIN :BALDI_BLUE);
+            DrawRectangleRounded(botonAplicar, 0.3f, 6, ratonSobreAplicar ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Aplicar", botonAplicar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? BALDI_SKIN :BALDI_BLUE);
+            DrawRectangleRounded(botonGenerar, 0.3f, 6, ratonSobreGenerar ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Generar", botonGenerar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonModificar, 0.3f, 6, ratonSobreModificar ? BALDI_SKIN :BALDI_BLUE);
+            DrawRectangleRounded(botonModificar, 0.3f, 6, ratonSobreModificar ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Modificar", botonModificar, 28, WHITE);
 
             //----------------Boton aplicar--------------
-            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? BALDI_SKIN :BALDI_BLUE);
+            DrawRectangleRounded(botonSalir, 0.3f, 6, ratonSobreSalir ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Salir", botonSalir, 28, WHITE);
             break;
 
         case SELEX:
         {
-            DrawTitleCentered("Escribe el nombre del Examen", 150, 28, GREEN);
-            DrawText("No incluyas espacios ni el '.txt'", 180, 210, 18, DARKGRAY);
+            DrawTitleCentered("Escribe el nombre del Examen", 30, 40, BALDI_RED);
+            DrawTitleCentered("No incluyas espacios ni el '.txt'",220, 28, BLACK);
 
             // Caja de texto
             DrawRectangle(150, 260, 400, 50, BALDI_SKIN);
@@ -402,14 +406,13 @@ int main()
             if ((int)(GetTime() * 2) % 2 == 0)
                 DrawText("_", 170 + MeasureText(nombreExamen, 24), 272, 24, BLACK);
 
-            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? BALDI_SKIN :BALDI_BLUE);
+            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? BALDI_SKIN : BALDI_BLUE);
             DrawTextCentered("Continuar", botonContinuar, 24, WHITE);
-            DrawText("Presiona ESC para volver al menú", 210, 520, 16, GRAY);
             break;
         }
         case APLICAR:
-            DrawTitleCentered("Examen", 30, 32, GREEN);
-            DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, DARKGRAY);
+            DrawTitleCentered("Examen", 20, 38, BALDI_RED);
+            DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, BLACK);
             if (preguntaActual != NULL) // Cambiado a preguntaActual
             {
                 char numPP[4];
@@ -418,46 +421,47 @@ int main()
                 DrawText(preguntaActual->pregunta, 65, 150, 30, BLACK);
                 char PPuntTot[4];
                 sprintf(PPuntTot, "%d", puntuacionTot);
-                DrawText(PPuntTot, 500, 110, 20, BLACK);
-                DrawText("pts totales", 540, 110, 20, BLACK);
+                DrawText(PPuntTot, 500, 750, 20, BLACK);
+                DrawText("pts totales", 540, 750, 20, BLACK);
 
                 // Mostrar las opciones leídas de la lista
                 for (int i = 0; i < 4; i++)
                 {
-                    DrawText(preguntaActual->respuestaTexto[i], 150, 220 + (i * 40), 20, DARKGRAY);
+                    DrawText(preguntaActual->respuestaTexto[i], 150, 220 + (i * 40), 20, BLACK);
                 }
                 if (preguntaActual->opcionSeleccionada != 0)
-                    DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? BALDI_SKIN :BALDI_BLUE);
+                    DrawRectangleRounded(botonOpcA, 0.9f, 1, ratonSobreOpcA ? BALDI_SKIN : BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 1)
-                    DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? BALDI_SKIN :BALDI_BLUE);
+                    DrawRectangleRounded(botonOpcB, 0.9f, 1, ratonSobreOpcB ? BALDI_SKIN : BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 2)
-                    DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? BALDI_SKIN :BALDI_BLUE);
+                    DrawRectangleRounded(botonOpcC, 0.9f, 1, ratonSobreOpcC ? BALDI_SKIN : BALDI_BLUE);
                 if (preguntaActual->opcionSeleccionada != 3)
-                    DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? BALDI_SKIN :BALDI_BLUE);
+                    DrawRectangleRounded(botonOpcD, 0.9f, 1, ratonSobreOpcD ? BALDI_SKIN : BALDI_BLUE);
             }
             else
             {
-                DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20,BALDI_BLUE);
+                DrawText("No hay preguntas cargadas en el examen.txt", 55, 150, 20, BALDI_BLUE);
             }
 
             if (calificar == true)
             {
-                DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? BALDI_SKIN :BALDI_BLUE);
+                DrawRectangleRounded(botonRegresar, 0.3f, 6, ratonSobreRegresar ? BALDI_SKIN : BALDI_BLUE);
                 DrawTextCentered("Regresar", botonRegresar, 28, WHITE);
-                DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? BALDI_SKIN :BALDI_BLUE);
+                DrawRectangleRounded(botonCalificar, 0.3f, 6, ratonSobreCalificar ? BALDI_SKIN : BALDI_BLUE);
                 DrawTextCentered("Calificar", botonCalificar, 28, WHITE);
                 if (calificacion == true)
                 {
                     char PPunt[4];
                     sprintf(PPunt, "%d", puntuacion);
-                    DrawText(PPunt, screenWidth / 2, 650, 30, BLACK);
+                    DrawText("Puntuacion: ",screenWidth/2-180,750,30,BLACK);
+                    DrawText(PPunt, screenWidth / 2, 750, 30, BLACK);
                 }
             }
             break;
 
         case GENERAR:
-            DrawTitleCentered("Creador de Preguntas", 30, 32, GREEN);
-            DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 20, DARKGRAY);
+            DrawTitleCentered("Creador de Preguntas", 20, 38, BALDI_RED);
+            DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 20, BALDI_RED);
 
             DrawText("Pregunta:", 50, 110, 18, BLACK);
             DrawRectangle(50, 135, 600, 35, BALDI_SKIN);
