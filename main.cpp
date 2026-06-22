@@ -1,7 +1,7 @@
 #include "GenEx.h++"
 #include "ApEx.h++"
 #include "colores.h"
-enum estados
+enum estadosexo
 {
     MENU,
     SELEX,
@@ -26,6 +26,7 @@ void DrawTitleCentered(const char *text, int y, int fontSize, Color color)
     DrawText(text, textX, y, fontSize, color);
 }
 using namespace baldiColores;
+
 int main()
 {
     const int screenWidth = 700;
@@ -38,7 +39,7 @@ int main()
     Texture2D fondoMenu = LoadTexture("public/schoolIn.jpg");
     estados estadoJ = MENU;
 
-    // variables para selex
+    // variables para selsex
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
     int letrasExamen = 0;         // Contador de caracteres para el nombre
     int subModo = 0;
@@ -207,9 +208,35 @@ int main()
                     {
                         estadoJ = GENERAR;
                     }
-                    else if (subModo == 3)
+                    else if (subModo == 3) // Modo Modificar
                     {
-                        estadoJ = MODIFICAR;
+                        // Limpiamos la lista si había una antes
+                        while (lista != NULL)
+                        {
+                            formatoPregunta *aux = lista;
+                            lista = lista->sig;
+                            delete aux;
+                        }
+                        lista = cargar(archivoFinal); // Cargamos el para modificar
+
+                        if (lista != NULL)
+                        {
+                            preguntaActual = lista;
+                            numP = 1;
+                            indice = -1; // Empezamos editando la pregunta
+
+                            // Ajustamos los contadores de letras para la pregunta 1
+                            contadorDeCaracteres = strlen(preguntaActual->pregunta);
+                            for (int i = 0; i < 4; i++)
+                            {
+                                contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
+                            }
+                            estadoJ = MODIFICAR;
+                        }
+                        else
+                        {
+                            estadoJ = MENU;
+                        }
                     }
                 }
             }
@@ -338,7 +365,70 @@ int main()
             }
             break;
         }
+    case MODIFICAR:
+        if (preguntaActual != NULL)
+        {
+            if (IsKeyPressed(KEY_RIGHT) && preguntaActual->sig != NULL)
+            {
+                preguntaActual = preguntaActual->sig;
+                numP++;
+                // Actualizamos contadores al cambiar de pregunta
+                contadorDeCaracteres = strlen(preguntaActual->pregunta);
+                for (int i = 0; i < 4; i++)
+                    contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
+            }
+            else if (IsKeyPressed(KEY_LEFT) && preguntaActual->ant != NULL)
+            {
+                preguntaActual = preguntaActual->ant;
+                numP--;
+                // Actualizamos contadores al cambiar de pregunta
+                contadorDeCaracteres = strlen(preguntaActual->pregunta);
+                for (int i = 0; i < 4; i++)
+                    contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
+            }
 
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                indice++;
+                if (indice > 5)
+                    indice = -1;
+            }
+            if (IsKeyPressed(KEY_UP))
+            {
+                indice--;
+                if (indice < -1)
+                    indice = 5;
+            }
+
+            if (indice == -1)
+            {
+                capturarPregunta(preguntaActual, contadorDeCaracteres);
+            }
+            else if (indice >= 0 && indice <= 3)
+            {
+                capturarResepuesta(preguntaActual, contadorCaractersR[indice], indice);
+            }
+            else if (indice == 4)
+            {
+                capuitraRC(preguntaActual);
+            }
+            else if (indice == 5)
+            {
+                capturaPA(preguntaActual);
+            }
+
+            // GUARDAR
+            char archivoFinal[60];
+            sprintf(archivoFinal, "%s.txt", nombreExamen);
+
+            if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                sobrescribirExamen(lista, archivoFinal);
+                estadoJ = MENU;
+            }
+        }
+        break;
+    }
         //--dibujar--
         BeginDrawing();
 
@@ -506,7 +596,59 @@ int main()
             DrawTextCentered("Guardar y siguiente", botonGuardarYSiguiente, 24, WHITE);
             break;
         case MODIFICAR:
-        
+            if (preguntaActual != NULL)
+            {
+                DrawTitleCentered("Modificar Examen", 20, 38, BALDI_RED);
+                DrawText("Usa FLECHAS IZQUIERDA/DERECHA para cambiar de pregunta.", 50, 65, 18, BALDI_BLUE);
+                DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones.", 50, 85, 18, BALDI_RED);
+
+                char tituloNum[30];
+                sprintf(tituloNum, "Editando Pregunta: %d", numP);
+                DrawText(tituloNum, 50, 115, 20, DARKGRAY);
+
+                //  la Pregunta
+                DrawRectangle(50, 140, 600, 35, BALDI_SKIN);
+                DrawText(preguntaActual->pregunta, 60, 147, 18, BLACK);
+                if (indice == -1 && (int)(GetTime() * 2) % 2 == 0)
+                    DrawText("_", 60 + MeasureText(preguntaActual->pregunta, 18), 147, 18, BLACK);
+
+                // las Opciones
+                for (int i = 0; i < 4; i++)
+                {
+                    int posYLabel = 185 + (i * 75);
+                    int posYBox = 210 + (i * 75);
+
+                    char prefijo[12] = {'O', 'p', 'c', 'i', 'o', 'n', ' ', (char)('A' + i), ':', '\0'};
+                    DrawText(prefijo, 50, posYLabel, 18, BLACK);
+                    DrawRectangle(50, posYBox, 600, 35, BALDI_SKIN);
+                    DrawText(preguntaActual->respuestaTexto[i], 60, posYBox + 7, 18, BLACK);
+
+                    if (indice == i && (int)(GetTime() * 2) % 2 == 0)
+                        DrawText("_", 60 + MeasureText(preguntaActual->respuestaTexto[i], 18), posYBox + 7, 18, BLACK);
+                }
+
+                // Respuesta Correcta
+                DrawText("Presiona la tecla (A, B, C, D) para la respuesta correcta:", 50, 495, 18, BLACK);
+                DrawRectangle(50, 520, 200, 35, BALDI_SKIN);
+                char opcCorr[2] = {'-', '\0'};
+                for (int i = 0; i < 4; i++)
+                {
+                    if (preguntaActual->respuestaCorrecta[i] == 1)
+                        opcCorr[0] = 'A' + i;
+                }
+                DrawText(opcCorr, 140, 527, 20, BLACK);
+
+                // putaje
+                DrawText("Asigna un puntaje (Tecla num. 0-9):", 50, 570, 18, BLACK);
+                DrawRectangle(50, 595, 200, 35, BALDI_SKIN);
+                char puntajeTxt[4];
+                sprintf(puntajeTxt, "%d", preguntaActual->puntajeAsignado);
+                DrawText(puntajeTxt, 140, 602, 20, BLACK);
+
+                // guardar
+                DrawRectangleRounded(botonGuardarYSalir, 0.3f, 6, ratonSobreGuardarYSalir ? DARKGREEN : GREEN);
+                DrawTextCentered("Guardar Cambios", botonGuardarYSalir, 24, WHITE);
+            }
             break;
         }
 
