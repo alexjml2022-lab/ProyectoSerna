@@ -1,7 +1,8 @@
 #include "GenEx.h++"
 #include "ApEx.h++"
 #include "colores.h"
-enum estadosexo
+#include "ModEx.h++"
+enum estados
 {
     MENU,
     SELEX,
@@ -364,71 +365,71 @@ int main()
                 estadoJ = GENERAR;
             }
             break;
+
+        case MODIFICAR:
+            if (preguntaActual != NULL)
+            {
+                if (IsKeyPressed(KEY_RIGHT) && preguntaActual->sig != NULL)
+                {
+                    preguntaActual = preguntaActual->sig;
+                    numP++;
+                    // Actualizamos contadores al cambiar de pregunta
+                    contadorDeCaracteres = strlen(preguntaActual->pregunta);
+                    for (int i = 0; i < 4; i++)
+                        contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
+                }
+                else if (IsKeyPressed(KEY_LEFT) && preguntaActual->ant != NULL)
+                {
+                    preguntaActual = preguntaActual->ant;
+                    numP--;
+                    // Actualizamos contadores al cambiar de pregunta
+                    contadorDeCaracteres = strlen(preguntaActual->pregunta);
+                    for (int i = 0; i < 4; i++)
+                        contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
+                }
+
+                if (IsKeyPressed(KEY_DOWN))
+                {
+                    indice++;
+                    if (indice > 5)
+                        indice = -1;
+                }
+                if (IsKeyPressed(KEY_UP))
+                {
+                    indice--;
+                    if (indice < -1)
+                        indice = 5;
+                }
+
+                if (indice == -1)
+                {
+                    capturarPregunta(preguntaActual, contadorDeCaracteres);
+                }
+                else if (indice >= 0 && indice <= 3)
+                {
+                    capturarResepuesta(preguntaActual, contadorCaractersR[indice], indice);
+                }
+                else if (indice == 4)
+                {
+                    capuitraRC(preguntaActual);
+                }
+                else if (indice == 5)
+                {
+                    capturaPA(preguntaActual);
+                }
+
+                // GUARDAR
+                char archivoFinal[60];
+                sprintf(archivoFinal, "%s.txt", nombreExamen);
+
+                if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+                {
+                    sobrescribirExamen(lista, archivoFinal);
+                    estadoJ = MENU;
+                }
+            }
+            break;
         }
-    case MODIFICAR:
-        if (preguntaActual != NULL)
-        {
-            if (IsKeyPressed(KEY_RIGHT) && preguntaActual->sig != NULL)
-            {
-                preguntaActual = preguntaActual->sig;
-                numP++;
-                // Actualizamos contadores al cambiar de pregunta
-                contadorDeCaracteres = strlen(preguntaActual->pregunta);
-                for (int i = 0; i < 4; i++)
-                    contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
-            }
-            else if (IsKeyPressed(KEY_LEFT) && preguntaActual->ant != NULL)
-            {
-                preguntaActual = preguntaActual->ant;
-                numP--;
-                // Actualizamos contadores al cambiar de pregunta
-                contadorDeCaracteres = strlen(preguntaActual->pregunta);
-                for (int i = 0; i < 4; i++)
-                    contadorCaractersR[i] = strlen(preguntaActual->respuestaTexto[i]);
-            }
-
-            if (IsKeyPressed(KEY_DOWN))
-            {
-                indice++;
-                if (indice > 5)
-                    indice = -1;
-            }
-            if (IsKeyPressed(KEY_UP))
-            {
-                indice--;
-                if (indice < -1)
-                    indice = 5;
-            }
-
-            if (indice == -1)
-            {
-                capturarPregunta(preguntaActual, contadorDeCaracteres);
-            }
-            else if (indice >= 0 && indice <= 3)
-            {
-                capturarResepuesta(preguntaActual, contadorCaractersR[indice], indice);
-            }
-            else if (indice == 4)
-            {
-                capuitraRC(preguntaActual);
-            }
-            else if (indice == 5)
-            {
-                capturaPA(preguntaActual);
-            }
-
-            // GUARDAR
-            char archivoFinal[60];
-            sprintf(archivoFinal, "%s.txt", nombreExamen);
-
-            if (ratonSobreGuardarYSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
-                sobrescribirExamen(lista, archivoFinal);
-                estadoJ = MENU;
-            }
-        }
-        break;
-    }
         //--dibujar--
         BeginDrawing();
 
