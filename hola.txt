@@ -1,4 +1,4 @@
 Pregunta:grvevrg	OpcionA:verfg	CORRECTA	OpcionB:rveg	INCORRECTA	OpcionC:rgve	INCORRECTA	OpcionD:regv	INCORRECTA	Puntaje:5
 Pregunta:tr4gb	OpcionA:rtgb	INCORRECTA	OpcionB:bthr	CORRECTA	OpcionC:tby	INCORRECTA	OpcionD:tyrb	INCORRECTA	Puntaje:5
 Pregunta:3re v	OpcionA:rtc	INCORRECTA	OpcionB:rtce	INCORRECTA	OpcionC:terc	CORRECTA	OpcionD:terc	INCORRECTA	Puntaje:2
-Pregunta:fdvsbfdsvfvd	OpcionA:dsfvbdfsb	CORRECTA	OpcionB:dfsbv	INCORRECTA	OpcionC:tdbgfd	INCORRECTA	OpcionD:btdtsd	INCORRECTA	Puntaje:5
+Pregunta:hola	OpcionA:prubea	INCORRECTA	OpcionB:ads	INCORRECTA	OpcionC:tdbgfd	INCORRECTA	OpcionD:btdtsd	CORRECTA	Puntaje:6

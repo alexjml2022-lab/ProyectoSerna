@@ -44,6 +44,9 @@ int main()
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
     int letrasExamen = 0;         // Contador de caracteres para el nombre
     int subModo = 0;
+    FilePathList archivosExamenes = {0};
+    int examenSeleccionado = 0;
+    bool archivosCargados = false;
 
     // variables para generar preguntas
 
@@ -120,6 +123,9 @@ int main()
                 subModo = 1; // Guardamos que queremos Aplicar
                 nombreExamen[0] = '\0';
                 letrasExamen = 0;
+                archivosExamenes = LoadDirectoryFiles(".");
+                examenSeleccionado = 0;
+                archivosCargados = true;
                 estadoJ = SELEX; // Vamos a la pantalla de escribir nombre
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -127,6 +133,7 @@ int main()
                 subModo = 2; // Guardamos que queremos Generar
                 nombreExamen[0] = '\0';
                 letrasExamen = 0;
+                archivosCargados = true;
                 estadoJ = SELEX; // Vamos a la pantalla de escribir nombre
             }
             if (ratonSobreModificar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -134,6 +141,9 @@ int main()
                 subModo = 3;
                 nombreExamen[0] = '\0';
                 letrasExamen = 0;
+                archivosExamenes = LoadDirectoryFiles(".");
+                examenSeleccionado = 0;
+
                 estadoJ = SELEX;
             }
             if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -146,34 +156,65 @@ int main()
 
         case SELEX:
         {
-            int key = GetCharPressed();
-            while (key > 0)
+
+            if (subModo == 2) // Modo Generar
             {
-                if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9') || key == '_')
+                int key = GetCharPressed();
+                while (key > 0)
                 {
-                    if (letrasExamen < 40)
+                    if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9') || key == '_')
                     {
-                        nombreExamen[letrasExamen] = (char)key;
-                        nombreExamen[letrasExamen + 1] = '\0';
-                        letrasExamen++;
+                        if (letrasExamen < 40)
+                        {
+                            nombreExamen[letrasExamen] = (char)key;
+                            nombreExamen[letrasExamen + 1] = '\0';
+                            letrasExamen++;
+                        }
                     }
+                    key = GetCharPressed();
                 }
-                key = GetCharPressed();
-            }
 
-            if (IsKeyPressed(KEY_BACKSPACE) && letrasExamen > 0)
+                if (IsKeyPressed(KEY_BACKSPACE) && letrasExamen > 0)
+                {
+                    letrasExamen--;
+                    nombreExamen[letrasExamen] = '\0';
+                }
+                estadoJ = GENERAR;
+            }
+            else // --- MODOS APLICAR/MODIFICAR: Selección con flechas ---
             {
-                letrasExamen--;
-                nombreExamen[letrasExamen] = '\0';
-            }
+                if (archivosCargados && archivosExamenes.count > 0)
+                {
+                    if (IsKeyPressed(KEY_DOWN))
+                    {
+                        examenSeleccionado++;
+                        if (examenSeleccionado >= archivosExamenes.count)
+                            examenSeleccionado = 0;
+                    }
+                    if (IsKeyPressed(KEY_UP))
+                    {
+                        examenSeleccionado--;
+                        if (examenSeleccionado < 0)
+                            examenSeleccionado = archivosExamenes.count - 1;
+                    }
 
+                    // Copiamos el nombre del archivo seleccionado a tu variable nombreExamen
+                    // Usamos GetFileName para limpiar la ruta completa y quedarnos solo con el nombre
+                    const char *archivoSeleccionado = GetFileName(archivosExamenes.paths[examenSeleccionado]);
+                    strcpy(nombreExamen, archivoSeleccionado);
+                    letrasExamen = strlen(nombreExamen);
+                }
+            }
             if (ratonSobreContinuar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
                 if (letrasExamen > 0)
                 {
                     // Construimos el nombre completo del archivo: "nombre.txt"
                     char archivoFinal[60];
-                    sprintf(archivoFinal, "%s.txt", nombreExamen);
+                    if (subModo == 2)
+                        sprintf(archivoFinal, "%s.txt", nombreExamen);
+                    else
+                        strcpy(archivoFinal, nombreExamen);
 
                     if (subModo == 1) // Modo Aplicar
                     {
@@ -203,6 +244,11 @@ int main()
                             calificar = false;
                             numP = 1;
                             estadoJ = APLICAR;
+                        }
+                        if (archivosCargados)
+                        {
+                            UnloadDirectoryFiles(archivosExamenes);
+                            archivosCargados = false;
                         }
                     }
                     else if (subModo == 2) // Modo Generar
@@ -237,6 +283,11 @@ int main()
                         else
                         {
                             estadoJ = MENU;
+                        }
+                        if (archivosCargados)
+                        {
+                            UnloadDirectoryFiles(archivosExamenes);
+                            archivosCargados = false;
                         }
                     }
                 }
@@ -487,19 +538,61 @@ int main()
             DrawTitleCentered("Escribe el nombre del Examen", 30, 40, BALDI_RED);
             DrawTitleCentered("No incluyas espacios ni el '.txt'", 220, 28, BLACK);
 
-            // Caja de texto
-            DrawRectangle(150, 260, 400, 50, BALDI_SKIN);
-            DrawRectangleLines(150, 260, 400, 50, DARKGRAY);
-            DrawText(nombreExamen, 170, 272, 24, BLACK);
+            if (subModo == 2)
+            {
 
-            // Efecto de cursor parpadeante
-            if ((int)(GetTime() * 2) % 2 == 0)
-                DrawText("_", 170 + MeasureText(nombreExamen, 24), 272, 24, BLACK);
+                // Caja de texto
+                DrawRectangle(150, 260, 400, 50, BALDI_SKIN);
+                DrawRectangleLines(150, 260, 400, 50, DARKGRAY);
+                DrawText(nombreExamen, 170, 272, 24, BLACK);
 
-            DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? BALDI_SKIN : BALDI_BLUE);
-            DrawTextCentered("Continuar", botonContinuar, 24, WHITE);
-            break;
-        }
+                // Efecto de cursor parpadeante
+                if ((int)(GetTime() * 2) % 2 == 0)
+                    DrawText("_", 170 + MeasureText(nombreExamen, 24), 272, 24, BLACK);
+            }
+            else // Visualización para Aplicar o Modificar Examen
+            {
+                DrawTitleCentered("Selecciona un Examen de la lista", 30, 40, BALDI_RED);
+                DrawTitleCentered("Usa FLECHAS ARRIBA/ABAJO para navegar", 90, 22, BLACK);
+
+                // Dibujamos un contenedor para la lista
+                DrawRectangle(100, 140, 500, 280, BALDI_SKIN);
+                DrawRectangleLines(100, 140, 500, 280, DARKGRAY);
+
+                if (archivosCargados && archivosExamenes.count > 0)
+                {
+                    // Mostramos un máximo de 5 archivos en pantalla para no salirnos del contenedor
+                    int inicio = 0;
+                    if (examenSeleccionado >= 5)
+                        inicio = examenSeleccionado - 4;
+
+                    int renglon = 0;
+                    for (int i = inicio; i < archivosExamenes.count && renglon < 5; i++)
+                    {
+                        const char *nombreMostrado = GetFileName(archivosExamenes.paths[i]);
+                        int posY = 160 + (renglon * 45);
+
+                        if (i == examenSeleccionado)
+                        {
+                            // Resaltamos el archivo seleccionado actualmente
+                            DrawRectangle(120, posY - 5, 460, 35, BALDI_BLUE);
+                            DrawText(nombreMostrado, 140, posY, 20, WHITE);
+                        }
+                        else
+                        {
+                            DrawText(nombreMostrado, 140, posY, 20, BLACK);
+                        }
+                        renglon++;
+                    }
+                }
+                else
+                {
+                    DrawText("No se encontraron archivos en la carpeta.", 140, 240, 20, RED);
+                }
+                DrawRectangleRounded(botonContinuar, 0.3f, 6, ratonSobreContinuar ? BALDI_SKIN : BALDI_BLUE);
+                DrawTextCentered("Continuar", botonContinuar, 24, WHITE);
+                break;
+            }
         case APLICAR:
             DrawTitleCentered("Examen", 20, 38, BALDI_RED);
             DrawText("Usa FLECHAS IZQUIERDA/DERECHA para moverte entre opciones", 10, 75, 20, BLACK);
@@ -550,6 +643,7 @@ int main()
             break;
 
         case GENERAR:
+        {
             DrawTitleCentered("Creador de Preguntas", 20, 38, BALDI_RED);
             DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones", 50, 75, 20, BALDI_RED);
 
@@ -595,17 +689,20 @@ int main()
             DrawTextCentered("Guardar y salir", botonGuardarYSalir, 24, WHITE);
             DrawRectangleRounded(botonGuardarYSiguiente, 0.3f, 6, ratonSobreGuardarYSiguiente ? DARKGREEN : GREEN);
             DrawTextCentered("Guardar y siguiente", botonGuardarYSiguiente, 24, WHITE);
-            break;
+        }
+        break;
+
         case MODIFICAR:
+        {
             if (preguntaActual != NULL)
             {
                 DrawTitleCentered("Modificar Examen", 20, 38, BALDI_RED);
-                DrawText("Usa FLECHAS IZQUIERDA/DERECHA para cambiar de pregunta.", 50, 65, 18, BALDI_BLUE);
-                DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones.", 50, 85, 18, BALDI_RED);
+                DrawText("Usa FLECHAS IZQUIERDA/DERECHA para cambiar de pregunta.", 50, 55, 20, BALDI_RED);
+                DrawText("Usa FLECHAS ARRIBA/ABAJO para moverte entre opciones.", 50, 85, 20, BALDI_RED);
 
                 char tituloNum[30];
                 sprintf(tituloNum, "Editando Pregunta: %d", numP);
-                DrawText(tituloNum, 50, 115, 20, DARKGRAY);
+                DrawText(tituloNum, 50, 115, 20, BLACK);
 
                 //  la Pregunta
                 DrawRectangle(50, 140, 600, 35, BALDI_SKIN);
@@ -650,18 +747,18 @@ int main()
                 DrawRectangleRounded(botonGuardarYSalir, 0.3f, 6, ratonSobreGuardarYSalir ? DARKGREEN : GREEN);
                 DrawTextCentered("Guardar Cambios", botonGuardarYSalir, 24, WHITE);
             }
-            break;
         }
-
-        EndDrawing();
+        break;
+        }
+            EndDrawing();
+        }
+        while (lista != NULL)
+        {
+            formatoPregunta *aux = lista;
+            lista = lista->sig;
+            delete aux;
+        }
+        delete nuevaPregunta;
+        CloseWindow();
+        return 0;
     }
-    while (lista != NULL)
-    {
-        formatoPregunta *aux = lista;
-        lista = lista->sig;
-        delete aux;
-    }
-    delete nuevaPregunta;
-    CloseWindow();
-    return 0;
-}
