@@ -10,7 +10,6 @@ enum estados
     GENERAR,
     MODIFICAR,
     SALIR
-
 };
 void DrawTextCentered(const char *text, Rectangle btn, int fontSize, Color color)
 {
@@ -44,10 +43,10 @@ int main()
     char nombreExamen[50] = "\0"; // Aquí guardaremos el nombre (ej. "matematicas")
     int letrasExamen = 0;         // Contador de caracteres para el nombre
     int subModo = 0;
-    
+
     // Control de archivos del directorio
-    FilePathList archivosExamenes = { 0 };
-    int examenSeleccionadoIdx = 0;
+    FilePathList archivosExamenes = {0};
+    int examenSeleccionado = 0;
     bool archivosCargados = false;
 
     // variables para generar preguntas
@@ -125,11 +124,11 @@ int main()
                 subModo = 1; // Guardamos que queremos Aplicar
                 nombreExamen[0] = '\0';
                 letrasExamen = 0;
-                
+
                 archivosExamenes = LoadDirectoryFiles(".");
-                examenSeleccionadoIdx = 0;
+                examenSeleccionado = 0;
                 archivosCargados = true;
-                
+
                 estadoJ = SELEX; // Vamos a la pantalla de escribir nombre
             }
             if (ratonSobreGenerar && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -145,11 +144,11 @@ int main()
                 subModo = 3;
                 nombreExamen[0] = '\0';
                 letrasExamen = 0;
-                
+
                 archivosExamenes = LoadDirectoryFiles(".");
-                examenSeleccionadoIdx = 0;
+                examenSeleccionado = 0;
                 archivosCargados = true;
-                
+
                 estadoJ = SELEX;
             }
             if (ratonSobreSalir && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
@@ -192,36 +191,40 @@ int main()
                     if (IsKeyPressed(KEY_DOWN))
                     {
                         // Saltamos cíclicamente hasta encontrar el próximo archivo .txt
-                        do {
-                            examenSeleccionadoIdx++;
-                            if (examenSeleccionadoIdx >= archivosExamenes.count) examenSeleccionadoIdx = 0;
-                        } while (!IsFileExtension(archivosExamenes.paths[examenSeleccionadoIdx], ".txt"));
+                        do
+                        {
+                            examenSeleccionado++;
+                            if (examenSeleccionado >= archivosExamenes.count)
+                                examenSeleccionado = 0;
+                        } while (!IsFileExtension(archivosExamenes.paths[examenSeleccionado], ".txt"));
                     }
                     if (IsKeyPressed(KEY_UP))
                     {
                         // Saltamos cíclicamente hacia arriba hasta encontrar el próximo archivo .txt
-                        do {
-                            examenSeleccionadoIdx--;
-                            if (examenSeleccionadoIdx < 0) examenSeleccionadoIdx = archivosExamenes.count - 1;
-                        } while (!IsFileExtension(archivosExamenes.paths[examenSeleccionadoIdx], ".txt"));
+                        do
+                        {
+                            examenSeleccionado--;
+                            if (examenSeleccionado < 0)
+                                examenSeleccionado = archivosExamenes.count - 1;
+                        } while (!IsFileExtension(archivosExamenes.paths[examenSeleccionado], ".txt"));
                     }
 
                     // Forzamos el índice inicial si no apunta a un .txt válido en la primera carga
-                    if (!IsFileExtension(archivosExamenes.paths[examenSeleccionadoIdx], ".txt"))
+                    if (!IsFileExtension(archivosExamenes.paths[examenSeleccionado], ".txt"))
                     {
                         for (int i = 0; i < archivosExamenes.count; i++)
                         {
                             if (IsFileExtension(archivosExamenes.paths[i], ".txt"))
                             {
-                                examenSeleccionadoIdx = i;
+                                examenSeleccionado = i;
                                 break;
                             }
                         }
                     }
 
-                    if (IsFileExtension(archivosExamenes.paths[examenSeleccionadoIdx], ".txt"))
+                    if (IsFileExtension(archivosExamenes.paths[examenSeleccionado], ".txt"))
                     {
-                        const char* archivoSeleccionado = GetFileName(archivosExamenes.paths[examenSeleccionadoIdx]);
+                        const char *archivoSeleccionado = GetFileName(archivosExamenes.paths[examenSeleccionado]);
                         strcpy(nombreExamen, archivoSeleccionado);
                         letrasExamen = strlen(nombreExamen);
                     }
@@ -234,8 +237,10 @@ int main()
                 {
                     // Construimos el nombre completo del archivo: "nombre.txt"
                     char archivoFinal[60];
-                    if (subModo == 2) sprintf(archivoFinal, "%s.txt", nombreExamen);
-                    else strcpy(archivoFinal, nombreExamen);
+                    if (subModo == 2)
+                        sprintf(archivoFinal, "%s.txt", nombreExamen);
+                    else
+                        strcpy(archivoFinal, nombreExamen);
 
                     if (subModo == 1) // Modo Aplicar
                     {
@@ -266,8 +271,12 @@ int main()
                             numP = 1;
                             estadoJ = APLICAR;
                         }
-                        
-                        if (archivosCargados) { UnloadDirectoryFiles(archivosExamenes); archivosCargados = false; }
+
+                        if (archivosCargados)
+                        {
+                            UnloadDirectoryFiles(archivosExamenes);
+                            archivosCargados = false;
+                        }
                     }
                     else if (subModo == 2) // Modo Generar
                     {
@@ -302,8 +311,11 @@ int main()
                         {
                             estadoJ = MENU;
                         }
-                        
-                        if (archivosCargados) { UnloadDirectoryFiles(archivosExamenes); archivosCargados = false; }
+                        if (archivosCargados)
+                        {
+                            UnloadDirectoryFiles(archivosExamenes);
+                            archivosCargados = false;
+                        }
                     }
                 }
             }
@@ -581,10 +593,10 @@ int main()
                         // Filtro visual estricto: solo imprimimos los archivos .txt
                         if (IsFileExtension(archivosExamenes.paths[i], ".txt"))
                         {
-                            const char* nombreMostrado = GetFileName(archivosExamenes.paths[i]);
+                            const char *nombreMostrado = GetFileName(archivosExamenes.paths[i]);
                             int posY = 160 + (renglon * 45);
 
-                            if (i == examenSeleccionadoIdx)
+                            if (i == examenSeleccionado)
                             {
                                 DrawRectangle(120, posY - 5, 460, 35, BALDI_BLUE);
                                 DrawText(nombreMostrado, 140, posY, 20, WHITE);
